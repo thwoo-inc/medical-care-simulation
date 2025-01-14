@@ -4,6 +4,7 @@ keep current data to reset
 
 ```sql
 pg_dump -h localhost -p 54322 -d postgres -U postgres \
+--table='auth.users' \
 --table='medical_care_templates' \
 --table='medical_cares' \
 --data-only \
