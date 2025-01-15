@@ -1,10 +1,10 @@
-// 'use client';
+'use client';
 
-import { proceduresByCardiology } from '@/app/medical_care_templates/procedure-cardiology';
-import { proceduresByICU } from '@/app/medical_care_templates/procedure-icu';
-import { proceduresByNICU } from '@/app/medical_care_templates/procedure-nicu';
-import { proceduresByObstetrics } from '@/app/medical_care_templates/procedure-obstetrics';
+import Spinner from '@/components/spinner';
 import { Card } from '@/components/ui/card';
+import { useAuth } from '@/hooks/use-auth';
+import { useMedicalCareTemplateAll } from '@/hooks/use-medical-care-query';
+import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import {
   DepartmentAnesthesiology,
@@ -12,70 +12,73 @@ import {
   DepartmentNICU,
   DepartmentObstetrics,
 } from '@/types/department';
-import { MedicalcareTemplate } from '@/types/medical-care-template';
+import { Procedure } from '@/types/medical-care-template';
+import { useQuery } from '@tanstack/react-query';
+import { ClipboardList } from 'lucide-react';
+// import { useRouter } from 'next/navigation';
+// import { useEffect } from 'react';
 // import { fetchTreatmentTemplates } from '@/utils/supabase';
 // import { useEffect, useState } from 'react';
 
 export default function Page() {
-  // const [templates, setTemplate] = useState<TreatmentTemplate[]>([]);
-  const templates = getTreatmentTemplates();
+  const auth = useAuth();
 
-  // useEffect(() => {
-  //   async function fetchTemplates() {
-  //     const rowTemplates = await fetchTreatmentTemplates();
-  //     if (rowTemplates === null) {
-  //       console.error('data is null');
-  //       return;
-  //     }
-  //     // 「procedures は実際には Procedure[] だよ」と断言している
-  //     const templates: TreatmentTemplate[] = rowTemplates.map((t) => ({
-  //       ...t,
-  //       procedures: t.procedures as Procedure[],
-  //     }));
-  //     console.log('success: ' + templates.length);
+  console.log(`auth.session: ${auth.session}`);
 
-  //     setTemplate(templates);
-  //   }
-  //   fetchTemplates();
-  // }, []);
+  const {
+    data: templates,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    ...useMedicalCareTemplateAll({ client: supabase }),
+    enabled: !!auth.session,
+  });
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-8">
-      <h1 className="text-2xl my-8">医療テンプレート</h1>
-      {templates.map((template) => (
-        <Card key={template.id} className="p-4 bg-muted flex flex-col">
-          <h2 className="text-lg my-4">{template.symptom}</h2>
-          <ul className="space-y-2">
-            {template.procedures.map((procedure, idx) => (
-              <li key={idx} className="flex space-x-2">
-                <p className={cn('text-sm p-1', border(procedure.department))}>
-                  {procedure.department}
-                </p>
-                <p className="text-sm">{procedure.label}</p>
-              </li>
-            ))}
-          </ul>
-        </Card>
-      ))}
+      <h1 className="text-2xl my-8 flex items-center gap-2">
+        <ClipboardList />
+        テンプレート
+      </h1>
+      {isLoading && <Spinner />}
+      {isError && <div className="text-red-500">{error.message}</div>}
+      {!isLoading &&
+        templates &&
+        templates.map((template) => (
+          <Card key={template.id} className="p-4 bg-muted flex flex-col">
+            <h2 className="text-lg my-4">{template.symptom}</h2>
+            <ul className="grid grid-cols-2 gap-2">
+              {template.procedures.map((procedure: Procedure, idx: number) => (
+                <li key={idx} className="flex space-x-2">
+                  <p className={cn('text-sm p-1', border(procedure.department))}>
+                    {procedure.department}
+                  </p>
+                  <p className="text-sm truncate">{procedure.label}</p>
+                </li>
+              ))}
+            </ul>
+          </Card>
+        ))}
     </div>
   );
 }
 
-const getTreatmentTemplates = (): MedicalcareTemplate[] => {
-  // 配列の結合を返す
-  return [
-    {
-      id: '1234',
-      symptom: '死戦期帝王切開（院内発生）',
-      procedures: proceduresByObstetrics.concat(
-        proceduresByNICU,
-        proceduresByICU,
-        proceduresByCardiology,
-      ),
-      created_at: '2025-01-14T07:22:03.366884',
-    },
-  ];
-};
+// const getTreatmentTemplates = (): MedicalcareTemplate[] => {
+//   // 配列の結合を返す
+//   return [
+//     {
+//       id: '1234',
+//       symptom: '死戦期帝王切開（院内発生）',
+//       procedures: proceduresByObstetrics.concat(
+//         proceduresByNICU,
+//         proceduresByICU,
+//         proceduresByCardiology,
+//       ),
+//       created_at: '2025-01-14T07:22:03.366884',
+//     },
+//   ];
+// };
 
 const border = (department: string) => {
   switch (department) {

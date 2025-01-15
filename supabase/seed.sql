@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 15.1 (Ubuntu 15.1-1.pgdg20.04+1)
+-- Dumped from database version 15.8
 -- Dumped by pg_dump version 15.8 (Homebrew)
 
 SET statement_timeout = 0;
@@ -20,7 +20,7 @@ SET row_security = off;
 -- Data for Name: users; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
 --
 
-INSERT INTO auth.users VALUES ('00000000-0000-0000-0000-000000000000', '41063143-1021-4f9f-aafc-0ef24e596a09', 'authenticated', 'authenticated', '2f8166a4-e722-4c57-a484-b30edd70621b@anonymous.com', '$2a$10$XczXToqW2sd4D.LKjeEjJ.fXgJcOV55eBj5rbdVqMEDoCDGsrPgmO', '2025-01-14 09:47:16.170841+00', NULL, '', NULL, '56887cd3c27934935da0b96cfbc9eea14663390e1755909f5544eb23', '2025-01-14 09:47:16.178871+00', '', '', NULL, '2025-01-14 09:47:16.174913+00', '{"provider": "email", "providers": ["email"]}', '{"anonymous": true}', NULL, '2025-01-14 09:47:16.166785+00', '2025-01-14 09:47:16.181472+00', NULL, NULL, '', '', NULL, DEFAULT, '', 0, NULL, '', NULL, false, NULL);
+INSERT INTO auth.users VALUES ('00000000-0000-0000-0000-000000000000', '68f1af09-46ef-41a6-8b27-57fb60f686b5', 'authenticated', 'authenticated', NULL, '', NULL, NULL, '', NULL, '', NULL, '', '', NULL, '2025-01-15 06:31:44.49608+00', '{}', '{}', NULL, '2025-01-15 06:31:44.490795+00', '2025-01-15 13:47:48.437573+00', NULL, NULL, '', '', NULL, DEFAULT, '', 0, NULL, '', NULL, false, NULL, true);
 
 
 --

@@ -7,7 +7,7 @@ CREATE TABLE medical_care_templates (
 );
 
 ALTER TABLE medical_care_templates ENABLE ROW LEVEL SECURITY;
-CREATE POLICY permit_authenticated_read ON medical_care_templates FOR SELECT TO authenticated USING (TRUE);
+CREATE POLICY permit_authenticated_read ON medical_care_templates FOR SELECT USING (auth.uid() IS NOT NULL);
 CREATE POLICY permit_authenticated_insert ON medical_care_templates FOR INSERT TO authenticated WITH CHECK (TRUE);
 CREATE POLICY permit_authenticated_update ON medical_care_templates FOR UPDATE TO authenticated WITH CHECK (TRUE);
 CREATE POLICY permit_authenticated_delete ON medical_care_templates FOR DELETE TO authenticated USING (TRUE);

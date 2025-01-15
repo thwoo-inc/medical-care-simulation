@@ -9,7 +9,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { Clock, FileText, Home } from 'lucide-react';
+import { BriefcaseMedical, ClipboardList, Hospital } from 'lucide-react';
 import Link from 'next/link';
 
 // Menu items.
@@ -17,17 +17,17 @@ const items = [
   {
     title: 'ホーム',
     url: '/',
-    icon: Home,
+    icon: Hospital,
   },
   {
     title: '過去の取り組み',
     url: '/medical_cares',
-    icon: Clock,
+    icon: BriefcaseMedical,
   },
   {
     title: 'テンプレート',
     url: '/medical_care_templates',
-    icon: FileText,
+    icon: ClipboardList,
   },
 ];
 

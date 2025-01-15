@@ -1,5 +1,5 @@
 import { Department } from '@/types/department';
-import { Database } from '@/utils/database.types';
+import { Database } from '@/lib/database.types';
 
 type SupabaseMedicalcareTemplate = Database['public']['Tables']['medical_care_templates']['Row'];
 
@@ -12,6 +12,6 @@ export type Procedure = {
   finished_at?: string;
 };
 
-export type MedicalcareTemplate = Omit<SupabaseMedicalcareTemplate, 'procedures'> & {
+export type MedicalCareTemplate = Omit<SupabaseMedicalcareTemplate, 'procedures'> & {
   procedures: Procedure[];
 };

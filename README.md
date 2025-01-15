@@ -19,6 +19,6 @@ npx supabase@beta db reset
 ```
 
 ```shell
-supabase gen types typescript --local > src/utils/database.types.ts
-npx supabase-to-zod --input src/utils/database.types.ts --output src/utils/zod.types.ts
+supabase gen types typescript --local > src/lib/database.types.ts
+npx supabase-to-zod --input src/lib/database.types.ts --output src/lib/zod.types.ts
 ```
