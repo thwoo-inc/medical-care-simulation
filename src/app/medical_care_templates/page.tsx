@@ -3,7 +3,7 @@
 import Spinner from '@/components/spinner';
 import { Card } from '@/components/ui/card';
 import { useAuth } from '@/hooks/use-auth';
-import { useMedicalCareTemplateAll } from '@/hooks/use-medical-care-query';
+import { useMedicalCareTemplateAll } from '@/hooks/use-medical-care-template-query';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import {
@@ -11,14 +11,11 @@ import {
   DepartmentICU,
   DepartmentNICU,
   DepartmentObstetrics,
+  DepartmentStaff,
 } from '@/types/department';
 import { Procedure } from '@/types/medical-care-template';
 import { useQuery } from '@tanstack/react-query';
 import { ClipboardList } from 'lucide-react';
-// import { useRouter } from 'next/navigation';
-// import { useEffect } from 'react';
-// import { fetchTreatmentTemplates } from '@/utils/supabase';
-// import { useEffect, useState } from 'react';
 
 export default function Page() {
   const auth = useAuth();
@@ -64,22 +61,6 @@ export default function Page() {
   );
 }
 
-// const getTreatmentTemplates = (): MedicalcareTemplate[] => {
-//   // 配列の結合を返す
-//   return [
-//     {
-//       id: '1234',
-//       symptom: '死戦期帝王切開（院内発生）',
-//       procedures: proceduresByObstetrics.concat(
-//         proceduresByNICU,
-//         proceduresByICU,
-//         proceduresByCardiology,
-//       ),
-//       created_at: '2025-01-14T07:22:03.366884',
-//     },
-//   ];
-// };
-
 const border = (department: string) => {
   switch (department) {
     case DepartmentObstetrics:
@@ -96,8 +77,8 @@ const border = (department: string) => {
     //   return 'border border-blue-500';
     case DepartmentAnesthesiology:
       return 'border border-purple-500';
-    // case '薬剤部':
-    //   return 'border border-pink-500';
+    case DepartmentStaff:
+      return 'border border-pink-500';
     default:
       return 'border border-gray-500';
   }

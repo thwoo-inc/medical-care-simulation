@@ -14,7 +14,7 @@ CREATE POLICY permit_authenticated_delete ON medical_care_templates FOR DELETE T
 
 -- 医療
 CREATE TABLE medical_cares (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id TEXT PRIMARY KEY,
     symptom TEXT NOT NULL,
     label TEXT NOT NULL,
     procedures JSONB,

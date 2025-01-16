@@ -1,12 +1,12 @@
 import { TypedSupabaseClient } from '@/lib/supabase';
-import { selectMedicalCareTemplates } from '@/queries/select-medical-care-templates';
+import { getMedicalCare } from '@/queries/select-medical-cares';
 
-const useMedicalCareTemplateAll = ({ client }: { client: TypedSupabaseClient }) => {
-  const queryKey = ['medical_care_templates', 'all'];
+const useMedicalCareById = ({ client, id }: { client: TypedSupabaseClient; id: string }) => {
+  const queryKey = ['medical_cares', id];
   const queryFn = async () => {
-    return selectMedicalCareTemplates(client).then((res) => res.data);
+    return getMedicalCare(client, id).then((res) => res.data);
   };
   return { queryKey, queryFn };
 };
 
-export { useMedicalCareTemplateAll };
+export { useMedicalCareById };
