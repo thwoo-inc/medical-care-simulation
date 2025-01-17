@@ -35,9 +35,10 @@ export default function Page() {
   }, [auth.session]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen relative space-y-8">
+    // <div className="flex flex-col items-center justify-center w-full min-h-screen relative space-y-8">
+    <div className="flex flex-col items-center justify-center w-full relative space-y-8 p-8">
       <div className="">
-        <h1 className="flex items-center gap-2 text-2xl">
+        <h1 className="flex items-center gap-2 text-2xl my-8">
           <BriefcaseMedical />
           過去の取り組み
         </h1>

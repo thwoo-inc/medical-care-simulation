@@ -155,7 +155,11 @@ export function MedicalCareInsertForm() {
           )}
         />
 
-        <Button type="submit" className="text-center w-full">
+        <Button
+          type="submit"
+          className="text-center w-full"
+          disabled={form.getValues().symptomId === '' || form.getValues().label === ''}
+        >
           シミュレーションを開始する
         </Button>
       </form>

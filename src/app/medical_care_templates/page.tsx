@@ -33,7 +33,7 @@ export default function Page() {
   });
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-8">
+    <div className="flex flex-col items-center justify-center p-8">
       <h1 className="text-2xl my-8 flex items-center gap-2">
         <ClipboardList />
         テンプレート

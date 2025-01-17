@@ -13,3 +13,13 @@ export type Department =
   | typeof DepartmentICU
   | typeof DepartmentAMEC3
   | typeof DepartmentCardiology;
+
+export const departmentOrders = [
+  DepartmentObstetrics,
+  DepartmentAnesthesiology,
+  DepartmentNICU,
+  DepartmentICU,
+  DepartmentAMEC3,
+  DepartmentCardiology,
+  DepartmentStaff,
+];

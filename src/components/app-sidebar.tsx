@@ -3,7 +3,7 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
-  SidebarGroupLabel,
+  // SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -34,12 +34,14 @@ const items = [
 export function AppSidebar() {
   return (
     <Sidebar>
-      <SidebarHeader />
+      <SidebarHeader>
+        <p className="text-lg my-8 font-bold">医療シミュレーション</p>
+      </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-lg my-8 font-bold">
+          {/* <SidebarGroupLabel className="text-lg my-8 font-bold">
             医療シミュレーション
-          </SidebarGroupLabel>
+          </SidebarGroupLabel> */}
           <SidebarMenu className="space-y-4">
             {items.map((item) => (
               <SidebarMenuItem key={item.title}>

@@ -24,8 +24,9 @@ export default function RootUserClient({
       <QueryClientProvider client={queryClient}>
         <SidebarProvider>
           <AppSidebar />
-          <main className="flex flex-col min-h-screen w-full p-4 relative">
-            <SidebarTrigger className="fixed" />
+          {/* <main className="flex flex-col min-h-screen w-full relative"> */}
+          <main className="w-full">
+            <SidebarTrigger className="fixed z-50 m-4 bg-muted size-8" />
             {children}
           </main>
         </SidebarProvider>

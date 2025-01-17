@@ -5,3 +5,13 @@ export const PhaseResuscitation = '蘇生準備/実施';
 export const PhasePMCDPreparation = 'PMCD準備';
 export const PhasePMCDImplementation = 'PMCD実施';
 export const PhasePCPS = 'PCPS';
+
+export const phaseOrders = [
+  PhaseTransportRequest,
+  PhaseCPAAwarenessInitialAction,
+  PhasePMCDEmergencyContact,
+  PhaseResuscitation,
+  PhasePMCDPreparation,
+  PhasePMCDImplementation,
+  PhasePCPS,
+];

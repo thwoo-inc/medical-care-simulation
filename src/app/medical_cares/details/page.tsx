@@ -6,63 +6,158 @@ import { getMedicalCare } from '@/queries/select-medical-cares';
 import { MedicalCare } from '@/types/medical-care';
 import { Procedure } from '@/types/medical-care-template';
 import { useSearchParams } from 'next/navigation';
-// import { supabase } from '@/lib/supabase';
-// import { MedicalCare } from '@/types/medical-care';
-// import { useParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
+import MedicalCareHeader from '@/components/medical-care-header';
+import { DepartmentTabs } from '@/components/department-tabs';
+import { DepartmentObstetrics } from '@/types/department';
+import { phaseOrders } from '@/types/phase';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+// import { durationTimeFormat } from '@/lib/date';
 
 function MedicalCareContent() {
   const auth = useAuth();
   const [care, setCare] = useState<MedicalCare | null>(null);
-  // const [isLoading, setIsLoading] = useState(true);
-  // const [error, setError] = useState<Error | null>(null);
+
+  const [selectedDept, setSelectedDept] = useState(DepartmentObstetrics);
 
   const searchParams = useSearchParams();
   const id = searchParams.get('id');
-  console.log(`id: ${id}`);
 
   useEffect(() => {
     if (!auth.session) {
-      console.log('no session');
       return;
     }
     if (!id) {
       console.log('no id');
       return;
     }
-    console.log(`fetch id: ${id}`);
 
     getMedicalCare(supabase, id).then((res) => {
       if (!res.data) {
         console.error('res no data');
         return;
       }
-      console.log(`res.data.label: ${res.data.label}`);
-      // resのproceduresをJsonからProcedure[]に変換
       const newCare: MedicalCare = {
         ...res.data,
         procedures: (res.data.procedures || []) as Procedure[],
       };
       setCare(newCare);
-
-      // setIsLoading(false);
     });
   }, [auth.session, id]);
 
-  // if (isLoading) return <div>読み込み中...</div>;
-  // if (error) return <div>エラー: {error.message}</div>;
-  // if (!medicalCare) return <div>データが見つかりません</div>;
+  // 終了処理
+  // const handleFinish = async () => {
+  //   if (!care) {
+  //     return;
+  //   }
+
+  //   try {
+  //     const result = await updateMedicalCare(supabase, care.id, {
+  //       finished_at: new Date().toISOString(),
+  //     });
+  //     if (result.error) {
+  //       console.error(`updateMedicalCare failed: ${result.error}`);
+  //       return;
+  //     }
+  //     console.log('updateMedicalCare success');
+  //   } catch (error) {
+  //     console.error(`updateMedicalCare catch: ${error}`);
+  //   }
+  // };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-8">
-      <h1>診療詳細</h1>
+    <div className="">
       {care && (
-        <div>
-          <div className="sticky top-0 bg-yellow-100 z-10">
-            <h1>{care.label}</h1>
+        <div className="">
+          <div className="sticky bg-white shadow top-0 z-0 flex justify-center items-center p-8 w-full flex-col space-y-4">
+            <MedicalCareHeader care={care} />
+            <DepartmentTabs
+              procedures={care.procedures}
+              current={selectedDept}
+              onChange={setSelectedDept}
+            />
           </div>
-          <div className="bg-pink-100 h-[120px]">タブエリア</div>
-          <div className="bg-blue-100 h-[480px]">aaa bbb</div>
+
+          <section className="p-8">
+            {phaseOrders.map((phase) => {
+              const procs = care.procedures.filter(
+                (proc) => proc.phase === phase && proc.department === selectedDept,
+              );
+
+              return procs.length > 0 ? (
+                <div key={phase} className="mb-8 space-y-4">
+                  <h2
+                    className="text-lg border-b-2 border-secondary-foreground inline-block font-bold"
+                    key={phase}
+                  >
+                    {phase}
+                  </h2>
+                  <ul className="flex flex-col ml-4 gap-2">
+                    {care.procedures
+                      .filter((proc) => proc.phase === phase && proc.department === selectedDept)
+                      .map((p) => (
+                        <li
+                          key={p.label}
+                          className={cn(
+                            'px-4 flex gap-4 items-center justify-between py-2 border border-primary rounded-lg',
+                            !p.started_at
+                              ? 'bg-white'
+                              : !p.finished_at
+                              ? 'bg-red-100'
+                              : 'bg-gray-100',
+                          )}
+                        >
+                          <div className="">
+                            <p className="text-lg">{p.label}</p>
+                            {!care.finished_at && !p.finished_at && (
+                              <p className="text-sm">{p.details}</p>
+                            )}
+                          </div>
+                          {!care.finished_at && (
+                            <div className="flex gap-2">
+                              <Button
+                                variant="secondary"
+                                className={cn(!p.started_at && 'invisible')}
+                              >
+                                戻す
+                              </Button>
+                              <Button className={cn(p.finished_at && 'invisible')}>
+                                {!p.started_at ? '開始' : '完了'}
+                              </Button>
+                            </div>
+                          )}
+                          {care.finished_at && (
+                            <div className="flex flex-col">
+                              {/* {care.started_at && p.started_at && (
+                                <p className="text-sm">
+                                  {durationTimeFormat(
+                                    new Date(care.started_at),
+                                    new Date(p.started_at),
+                                  )}{' '}
+                                  後に開始
+                                </p>
+                              )}
+                              {care.started_at && p.finished_at && (
+                                <p className="text-sm">
+                                  {durationTimeFormat(
+                                    new Date(care.started_at),
+                                    new Date(p.finished_at),
+                                  )}{' '}
+                                  後に完了
+                                </p>
+                              )} */}
+                              {care.started_at && <p className="text-sm">3分2秒 後に開始</p>}
+                              {care.started_at && <p className="text-sm">3分51秒 後に完了</p>}
+                            </div>
+                          )}
+                        </li>
+                      ))}
+                  </ul>
+                </div>
+              ) : null;
+            })}
+          </section>
         </div>
       )}
     </div>

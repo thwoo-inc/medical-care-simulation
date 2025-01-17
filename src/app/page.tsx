@@ -1,6 +1,7 @@
 'use client';
 
 import { MedicalCareDialog } from '@/components/medical-care-insert-dialog';
+import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useAuth } from '@/hooks/use-auth';
 import { supabase } from '@/lib/supabase';
@@ -21,6 +22,7 @@ export default function Page() {
       return;
     }
 
+    // const { data: inProgressCares, isLoading } = useMedicalCaresInProgress(supabase);
     selectMedicalCaresInProgress(supabase).then((res) => {
       if (!res.data) {
         console.error('res no data');
@@ -37,7 +39,8 @@ export default function Page() {
   }, [auth.session]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen relative space-y-8">
+    <div className="flex flex-col items-center justify-center relative space-y-8 p-8">
+      {/* <div className="flex flex-col items-center justify-center min-h-screen relative space-y-8"> */}
       <h1 className="text-2xl my-8 flex items-center gap-2">
         <Hospital />
         ホーム
@@ -55,12 +58,10 @@ export default function Page() {
         </ul>
       </section>
       <MedicalCareDialog>
-        <Card className="p-4 flex gap-2">
-          {/* <Button variant={'outline'} className="p-4 text-lg"> */}
+        <Button variant={'outline'} className="p-8">
           <Plus />
           新規シミュレーション
-          {/* </Button> */}
-        </Card>
+        </Button>
       </MedicalCareDialog>
     </div>
   );
