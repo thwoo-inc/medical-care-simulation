@@ -19,11 +19,11 @@ import {
 } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { supabase } from '@/lib/supabase';
-import { insertMedicalCare } from '@/queries/insert-medical-care';
 import { useMedicalCareTemplateAll } from '@/hooks/use-medical-care-template-query';
 import { useQuery } from '@tanstack/react-query';
 import { TablesInsert } from '@/lib/database.types';
 import { useRouter } from 'next/navigation';
+import { useCreateMedicalCare } from '@/service/medical-care';
 
 type FormValues = {
   symptomId: string;
@@ -47,6 +47,8 @@ export function MedicalCareInsertForm() {
       label: '',
     },
   });
+
+  const { mutate } = useCreateMedicalCare();
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -80,7 +82,7 @@ export function MedicalCareInsertForm() {
   };
 
   // フォム送信時の処理
-  const onSubmit = (data: FormValues) => {
+  const onSubmit = async (data: FormValues) => {
     if (!templates) {
       return;
     }
@@ -89,22 +91,16 @@ export function MedicalCareInsertForm() {
       return;
     }
 
-    console.log(`id: ${data.id}, label: ${data.label} `);
-    const care: TablesInsert<'medical_cares'> = Object.assign({}, template, {
+    const newCare: TablesInsert<'medical_cares'> = Object.assign({}, template, {
       id: data.id,
       label: data.label,
     });
 
-    insertMedicalCare(supabase, care).then((result) => {
-      if (result.error) {
-        console.error(`insertMedicalCare error: ${result.error}`);
-        return;
-      }
-      console.log('insertMedicalCare success');
-      form.reset();
+    await mutate({ newCare });
 
-      router.push(`/medical_cares/details?id=${data.id}`);
-    });
+    console.log('create mutate success');
+    form.reset();
+    router.push(`/medical_cares/details?id=${data.id}`);
   };
 
   return (

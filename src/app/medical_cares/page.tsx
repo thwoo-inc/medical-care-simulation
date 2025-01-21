@@ -1,38 +1,21 @@
 'use client';
 
 import { Card } from '@/components/ui/card';
-import { useAuth } from '@/hooks/use-auth';
-import { supabase } from '@/lib/supabase';
-import { selectMedicalCaresFinished } from '@/queries/select-medical-cares';
-import { MedicalCare } from '@/types/medical-care';
-import { Procedure } from '@/types/medical-care-template';
+import { useGetMedicalCaresFinished } from '@/service/medical-care';
 import { BriefcaseMedical } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
 
 export default function Page() {
-  const auth = useAuth();
-  const [cares, setCares] = useState<MedicalCare[]>([]);
+  const { data: cares, isPending, isError } = useGetMedicalCaresFinished();
 
-  useEffect(() => {
-    if (!auth.session) {
-      console.log('no session');
-      return;
-    }
+  if (isPending) {
+    return <div>読み込み中...</div>;
+  }
 
-    selectMedicalCaresFinished(supabase).then((res) => {
-      if (!res.data) {
-        console.error('res no data');
-        return;
-      }
-
-      const newCares: MedicalCare[] = res.data.map((item) => ({
-        ...item,
-        procedures: (item.procedures || []) as Procedure[],
-      }));
-      setCares(newCares);
-    });
-  }, [auth.session]);
+  if (isError) {
+    console.error('Error fetching medical care:');
+    return <div>エラーが発生しました。</div>;
+  }
 
   return (
     // <div className="flex flex-col items-center justify-center w-full min-h-screen relative space-y-8">
@@ -43,18 +26,19 @@ export default function Page() {
           過去の取り組み
         </h1>
       </div>
-      <p>検索機能は未実装です</p>
-      <section className="">
-        <ul className="p-4 space-y-4">
-          {cares.map((care) => (
-            <Card key={care.id} className="p-4 bg-muted flex flex-col">
-              <Link href={`/medical_cares/details?id=${care.id}`}>
-                <p className="">{care.label}</p>
-              </Link>
-            </Card>
-          ))}
-        </ul>
-      </section>
+      {cares && (
+        <section className="">
+          <ul className="p-4 space-y-4">
+            {cares.map((care) => (
+              <Card key={care.id} className="p-4 bg-muted flex flex-col">
+                <Link href={`/medical_cares/details?id=${care.id}`}>
+                  <p className="">{care.label}</p>
+                </Link>
+              </Card>
+            ))}
+          </ul>
+        </section>
+      )}
     </div>
   );
 }

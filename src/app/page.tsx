@@ -3,40 +3,21 @@
 import { MedicalCareDialog } from '@/components/medical-care-insert-dialog';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { useAuth } from '@/hooks/use-auth';
-import { supabase } from '@/lib/supabase';
-import { selectMedicalCaresInProgress } from '@/queries/select-medical-cares';
-import { MedicalCare } from '@/types/medical-care';
-import { Procedure } from '@/types/medical-care-template';
+import { useGetMedicalCaresInProgress } from '@/service/medical-care';
 import { Hospital, Plus } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
 
 export default function Page() {
-  const auth = useAuth();
-  const [cares, setCares] = useState<MedicalCare[]>([]);
+  const { data: cares, isPending, isError } = useGetMedicalCaresInProgress();
 
-  useEffect(() => {
-    if (!auth.session) {
-      console.log('no session');
-      return;
-    }
+  if (isPending) {
+    return <div>読み込み中...</div>;
+  }
 
-    // const { data: inProgressCares, isLoading } = useMedicalCaresInProgress(supabase);
-    selectMedicalCaresInProgress(supabase).then((res) => {
-      if (!res.data) {
-        console.error('res no data');
-        return;
-      }
-      console.log(`res.data.length: ${res.data.length}`);
-
-      const newCares: MedicalCare[] = res.data.map((item) => ({
-        ...item,
-        procedures: (item.procedures || []) as Procedure[],
-      }));
-      setCares(newCares);
-    });
-  }, [auth.session]);
+  if (isError) {
+    console.error('Error fetching medical care:');
+    return <div>エラーが発生しました。</div>;
+  }
 
   return (
     <div className="flex flex-col items-center justify-center relative space-y-8 p-8">
@@ -47,15 +28,17 @@ export default function Page() {
       </h1>
       <section className="">
         <h2 className="text-lg my-4 text-center">実施中のシミュレーション</h2>
-        <ul className="p-4 space-y-4">
-          {cares.map((care) => (
-            <Card key={care.id} className="p-4 bg-red-100 flex flex-col">
-              <Link href={`/medical_cares/details?id=${care.id}`}>
-                <p className="">{care.label}</p>
-              </Link>
-            </Card>
-          ))}
-        </ul>
+        {cares && (
+          <ul className="p-4 space-y-4">
+            {cares.map((care) => (
+              <Card key={care.id} className="p-4 bg-red-100 flex flex-col">
+                <Link href={`/medical_cares/details?id=${care.id}`}>
+                  <p className="">{care.label}</p>
+                </Link>
+              </Card>
+            ))}
+          </ul>
+        )}
       </section>
       <MedicalCareDialog>
         <Button variant={'outline'} className="p-8">

@@ -1,77 +1,86 @@
 'use client';
 
-import { useAuth } from '@/hooks/use-auth';
-import { supabase } from '@/lib/supabase';
-import { getMedicalCare } from '@/queries/select-medical-cares';
-import { MedicalCare } from '@/types/medical-care';
 import { Procedure } from '@/types/medical-care-template';
-import { useSearchParams } from 'next/navigation';
-import { Suspense, useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense, useState } from 'react';
 import MedicalCareHeader from '@/components/medical-care-header';
 import { DepartmentTabs } from '@/components/department-tabs';
-import { DepartmentObstetrics } from '@/types/department';
+import { DepartmentALL, DepartmentObstetrics } from '@/types/department';
 import { phaseOrders } from '@/types/phase';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-// import { durationTimeFormat } from '@/lib/date';
+import ProcedureItem from '@/components/procedure-item';
+import {
+  useDeleteMedicalCare,
+  useGetMedicalCare,
+  useUpdateMedicalCare,
+} from '@/service/medical-care';
+import { TablesUpdate } from '@/lib/database.types';
+import { ReportTabs } from '@/components/report-tabs';
+import { ReportDetail, ReportTimeline } from '@/types/report';
+import { MedicalCare } from '@/service/medical-care/type';
+import { durationTimeFormat } from '@/lib/date';
 
 function MedicalCareContent() {
-  const auth = useAuth();
-  const [care, setCare] = useState<MedicalCare | null>(null);
-
+  const router = useRouter();
   const [selectedDept, setSelectedDept] = useState(DepartmentObstetrics);
 
   const searchParams = useSearchParams();
   const id = searchParams.get('id');
 
-  useEffect(() => {
-    if (!auth.session) {
+  const { data: care, isPending, isError } = useGetMedicalCare(id || '');
+  const { mutate: mutateUpdate } = useUpdateMedicalCare();
+  const { mutate: mutateDelete } = useDeleteMedicalCare();
+
+  const [selectReport, setSelectReport] = useState(
+    care?.finished_at ? ReportTimeline : ReportDetail,
+  );
+
+  if (isPending) {
+    return <div>読み込み中...</div>;
+  }
+
+  if (isError) {
+    console.error('Error fetching medical care:');
+    return <div>エラーが発生しました。</div>;
+  }
+
+  // 医療の更新
+  const handleUpdateAny = async (updates: Partial<TablesUpdate<'medical_cares'>>) => {
+    if (!care) {
       return;
     }
-    if (!id) {
-      console.log('no id');
+    mutateUpdate({ id: care.id, updates });
+    if ('finished_at' in updates) {
+      router.push(`/medical_cares/`);
+    }
+  };
+
+  // 医療の削除
+  const handleDelete = async () => {
+    if (!care) {
       return;
     }
+    await mutateDelete({ id: care.id });
+    router.push(`/`);
+  };
 
-    getMedicalCare(supabase, id).then((res) => {
-      if (!res.data) {
-        console.error('res no data');
-        return;
-      }
-      const newCare: MedicalCare = {
-        ...res.data,
-        procedures: (res.data.procedures || []) as Procedure[],
-      };
-      setCare(newCare);
-    });
-  }, [auth.session, id]);
-
-  // 終了処理
-  // const handleFinish = async () => {
-  //   if (!care) {
-  //     return;
-  //   }
-
-  //   try {
-  //     const result = await updateMedicalCare(supabase, care.id, {
-  //       finished_at: new Date().toISOString(),
-  //     });
-  //     if (result.error) {
-  //       console.error(`updateMedicalCare failed: ${result.error}`);
-  //       return;
-  //     }
-  //     console.log('updateMedicalCare success');
-  //   } catch (error) {
-  //     console.error(`updateMedicalCare catch: ${error}`);
-  //   }
-  // };
+  // 処置の更新
+  const handleUpdateProcedure = async (proc: Procedure) => {
+    if (!care) {
+      return;
+    }
+    const newProcedures = care.procedures.map((p) =>
+      p.label === proc.label && p.department === proc.department ? proc : p,
+    );
+    mutateUpdate({ id: care.id, updates: { procedures: newProcedures } });
+  };
 
   return (
     <div className="">
       {care && (
         <div className="">
           <div className="sticky bg-white shadow top-0 z-0 flex justify-center items-center p-8 w-full flex-col space-y-4">
-            <MedicalCareHeader care={care} />
+            <MedicalCareHeader care={care} onUpdate={handleUpdateAny} onDelete={handleDelete} />
+            {care.finished_at && <ReportTabs current={selectReport} onChange={setSelectReport} />}
             <DepartmentTabs
               procedures={care.procedures}
               current={selectedDept}
@@ -80,89 +89,90 @@ function MedicalCareContent() {
           </div>
 
           <section className="p-8">
-            {phaseOrders.map((phase) => {
-              const procs = care.procedures.filter(
-                (proc) => proc.phase === phase && proc.department === selectedDept,
-              );
-
-              return procs.length > 0 ? (
-                <div key={phase} className="mb-8 space-y-4">
-                  <h2
-                    className="text-lg border-b-2 border-secondary-foreground inline-block font-bold"
-                    key={phase}
-                  >
-                    {phase}
-                  </h2>
-                  <ul className="flex flex-col ml-4 gap-2">
-                    {care.procedures
-                      .filter((proc) => proc.phase === phase && proc.department === selectedDept)
-                      .map((p) => (
-                        <li
-                          key={p.label}
-                          className={cn(
-                            'px-4 flex gap-4 items-center justify-between py-2 border border-primary rounded-lg',
-                            !p.started_at
-                              ? 'bg-white'
-                              : !p.finished_at
-                              ? 'bg-red-100'
-                              : 'bg-gray-100',
-                          )}
-                        >
-                          <div className="">
-                            <p className="text-lg">{p.label}</p>
-                            {!care.finished_at && !p.finished_at && (
-                              <p className="text-sm">{p.details}</p>
-                            )}
-                          </div>
-                          {!care.finished_at && (
-                            <div className="flex gap-2">
-                              <Button
-                                variant="secondary"
-                                className={cn(!p.started_at && 'invisible')}
-                              >
-                                戻す
-                              </Button>
-                              <Button className={cn(p.finished_at && 'invisible')}>
-                                {!p.started_at ? '開始' : '完了'}
-                              </Button>
-                            </div>
-                          )}
-                          {care.finished_at && (
-                            <div className="flex flex-col">
-                              {/* {care.started_at && p.started_at && (
-                                <p className="text-sm">
-                                  {durationTimeFormat(
-                                    new Date(care.started_at),
-                                    new Date(p.started_at),
-                                  )}{' '}
-                                  後に開始
-                                </p>
-                              )}
-                              {care.started_at && p.finished_at && (
-                                <p className="text-sm">
-                                  {durationTimeFormat(
-                                    new Date(care.started_at),
-                                    new Date(p.finished_at),
-                                  )}{' '}
-                                  後に完了
-                                </p>
-                              )} */}
-                              {care.started_at && <p className="text-sm">3分2秒 後に開始</p>}
-                              {care.started_at && <p className="text-sm">3分51秒 後に完了</p>}
-                            </div>
-                          )}
-                        </li>
-                      ))}
-                  </ul>
-                </div>
-              ) : null;
-            })}
+            {selectReport === ReportDetail &&
+              proceduresDetail(care, selectedDept, handleUpdateProcedure)}
+            {selectReport === ReportTimeline && proceduresTimeline(care, selectedDept)}
           </section>
         </div>
       )}
     </div>
   );
 }
+
+const proceduresDetail = (
+  care: MedicalCare,
+  selectedDept: string,
+  onUpdate: { (proc: Procedure): Promise<void>; (proc: Procedure): void },
+) => {
+  return phaseOrders.map((phase) => {
+    const procs = care.procedures.filter(
+      (proc) =>
+        proc.phase === phase &&
+        (selectedDept === DepartmentALL || proc.department === selectedDept),
+    );
+
+    return procs.length > 0 ? (
+      <div key={phase} className="mb-8 space-y-4">
+        <h2
+          className="text-lg border-b-2 border-secondary-foreground inline-block font-bold"
+          key={phase}
+        >
+          {phase}
+        </h2>
+        <ul className="flex flex-col ml-4 gap-2">
+          {care.procedures
+            .filter(
+              (proc) =>
+                proc.phase === phase &&
+                (selectedDept === DepartmentALL || proc.department === selectedDept),
+            )
+            .map((p) => (
+              <li key={`${p.department}_${p.label}`}>
+                <ProcedureItem care={care} proc={p} onUpdate={onUpdate} />
+              </li>
+            ))}
+        </ul>
+      </div>
+    ) : null;
+  });
+};
+
+const proceduresTimeline = (care: MedicalCare, selectedDept: string) => {
+  const orderProcedures = care.procedures
+    .filter(
+      (p) => !!p.started_at && (selectedDept === DepartmentALL || p.department === selectedDept),
+    )
+    .sort((a, b) => {
+      const aDate = new Date(a.started_at as string);
+      const bDate = new Date(b.started_at as string);
+      return aDate.getTime() - bDate.getTime();
+    });
+
+  return (
+    <div className="mb-8 space-y-4">
+      <h2 className="text-lg border-b-2 border-secondary-foreground inline-block font-bold">
+        時系列順
+      </h2>
+      <ul className="flex flex-col ml-4 gap-2">
+        {orderProcedures.map((p) => (
+          <li
+            key={`${p.department}_${p.label}`}
+            className="flex items-center gap-4 justify-between"
+          >
+            <p className="w-20 text-right flex-0">
+              {durationTimeFormat(new Date(care.started_at!), new Date(p.started_at!))}
+            </p>
+            <p className="text-xs px-4 py-2 border-2 border-muted rounded-lg">{p.department}</p>
+            <p className="text-lg flex-1">{p.label}</p>
+            {p.finished_at && (
+              <p>{durationTimeFormat(new Date(p.started_at!), new Date(p.finished_at!))}で完了</p>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
 
 // ページコンポーネント
 export default function MedicalCarePage() {

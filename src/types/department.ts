@@ -1,3 +1,4 @@
+export const DepartmentALL = 'ALL';
 export const DepartmentObstetrics = '産科';
 export const DepartmentNICU = 'NICU';
 export const DepartmentAnesthesiology = '麻酔科';
@@ -15,6 +16,7 @@ export type Department =
   | typeof DepartmentCardiology;
 
 export const departmentOrders = [
+  DepartmentALL,
   DepartmentObstetrics,
   DepartmentAnesthesiology,
   DepartmentNICU,

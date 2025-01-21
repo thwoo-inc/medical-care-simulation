@@ -9,68 +9,54 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { TablesUpdate } from '@/lib/database.types';
 import { durationTimeFormat } from '@/lib/date';
-import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
-import { deleteMedicalCare } from '@/queries/delete-medical-care';
-import { updateMedicalCare } from '@/queries/update-medical-care';
-import { MedicalCare } from '@/types/medical-care';
-import { useRouter } from 'next/navigation';
+import { MedicalCare } from '@/service/medical-care/type';
 import { useEffect, useState } from 'react';
 
-export default function MedicalCareHeader({ care }: { care: MedicalCare }) {
+type Props = {
+  care: MedicalCare;
+  onUpdate: (updates: Partial<TablesUpdate<'medical_cares'>>) => void;
+  onDelete: () => void;
+};
+
+export default function MedicalCareHeader({ care, onUpdate, onDelete }: Props) {
   const [elapsedTime, setElapsedTime] = useState<string>('');
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
   const [isFinishDialogOpen, setIsFinishDialogOpen] = useState(false);
-  const router = useRouter();
 
   // 経過時間を計算して更新する
   useEffect(() => {
-    if (!care?.started_at || care.finished_at) return;
+    if (!care?.started_at) return;
 
     const updateElapsedTime = () => {
-      const formatted = durationTimeFormat(new Date(care.started_at!), new Date());
+      const formatted = durationTimeFormat(
+        new Date(care.started_at!),
+        care.finished_at ? new Date(care.finished_at) : new Date(),
+      );
       setElapsedTime(formatted);
     };
 
-    // 初回実行
+    // 必ず初回実行
     updateElapsedTime();
-    // 1秒ごとに更新
-    const intervalId = setInterval(updateElapsedTime, 1000);
-
-    return () => clearInterval(intervalId);
+    // 終了してなければ1秒ごとに更新
+    if (!care.finished_at) {
+      const intervalId = setInterval(updateElapsedTime, 1000);
+      return () => clearInterval(intervalId);
+    }
   }, [care?.started_at, care?.finished_at]);
 
   // 取りやめ処理
   const handleCancel = async () => {
-    try {
-      const result = await deleteMedicalCare(supabase, care.id);
-      if (result.error) {
-        console.error(`deleteMedicalCare failed: ${result.error}`);
-        return;
-      }
-      console.log('deleteMedicalCare success');
-      router.push('/');
-    } catch (error) {
-      console.error(`deleteMedicalCare catch: ${error}`);
-    }
+    onDelete();
   };
 
   // 終了処理
   const handleFinish = async () => {
-    try {
-      const result = await updateMedicalCare(supabase, care.id, {
-        finished_at: new Date().toISOString(),
-      });
-      if (result.error) {
-        console.error(`updateMedicalCare failed: ${result.error}`);
-        return;
-      }
-      console.log('updateMedicalCare success');
-      router.push('/medical_cares');
-    } catch (error) {
-      console.error(`updateMedicalCare catch: ${error}`);
-    }
+    onUpdate({
+      finished_at: new Date().toISOString(),
+    });
   };
 
   return (
@@ -85,7 +71,7 @@ export default function MedicalCareHeader({ care }: { care: MedicalCare }) {
         </Button>
         <div className="flex flex-col items-center gap-2">
           <p className="text-muted-foreground">
-            {new Date(care.started_at!).toLocaleString()} 治療開始
+            {new Date(care.started_at!).toLocaleString()} 開始
           </p>
           {care.finished_at && (
             <p className="text-black text-xl font-bold">
@@ -93,7 +79,9 @@ export default function MedicalCareHeader({ care }: { care: MedicalCare }) {
             </p>
           )}
           {!care.finished_at && (
-            <p className="text-red-600 text-xl font-bold">{elapsedTime} 経過</p>
+            <p className="text-red-600 font-bold">
+              <span className="text-xl">{elapsedTime}</span> 経過
+            </p>
           )}
         </div>
         <div>

@@ -1,6 +1,6 @@
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Procedure } from '@/types/medical-care-template'; // Procedureの型定義は既存のものを使用すると仮定
-import { departmentOrders } from '@/types/department';
+import { DepartmentALL, departmentOrders } from '@/types/department';
 import { cn } from '@/lib/utils';
 
 type DepartmentTabsProps = {
@@ -14,6 +14,8 @@ export function DepartmentTabs({ procedures, current, onChange }: DepartmentTabs
   const availableDepartments = departmentOrders.filter((dept) =>
     procedures.some((proc) => proc.department === dept),
   );
+  // DepartmentALLを先頭に追加
+  availableDepartments.unshift(DepartmentALL);
 
   return (
     <Tabs value={current} onValueChange={onChange}>
@@ -24,7 +26,7 @@ export function DepartmentTabs({ procedures, current, onChange }: DepartmentTabs
             value={dept}
             className={cn(current === dept ? 'bg-primary text-primary-foreground' : '')}
           >
-            {dept}
+            {dept === '助産師/看護師' ? 'スタッフ' : dept}
           </TabsTrigger>
         ))}
       </TabsList>
