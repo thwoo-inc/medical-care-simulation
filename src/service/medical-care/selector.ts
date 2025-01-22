@@ -1,6 +1,6 @@
 import { Tables } from '@/lib/database.types';
 import { MedicalCare } from '@/service/medical-care/type';
-import { Procedure } from '@/types/medical-care-template';
+import { Procedure } from '@/types/procedure';
 
 export const getMedicalCareSelector = (data: Tables<'medical_cares'>): MedicalCare => {
   return {

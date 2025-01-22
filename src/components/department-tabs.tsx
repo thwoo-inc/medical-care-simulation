@@ -1,7 +1,7 @@
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Procedure } from '@/types/medical-care-template'; // Procedureの型定義は既存のものを使用すると仮定
 import { DepartmentALL, departmentOrders } from '@/types/department';
 import { cn } from '@/lib/utils';
+import { Procedure } from '@/types/procedure';
 
 type DepartmentTabsProps = {
   procedures: Procedure[];

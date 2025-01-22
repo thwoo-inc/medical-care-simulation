@@ -1,4 +1,4 @@
-import { Procedure } from '@/types/medical-care-template';
+import { Procedure } from '@/types/procedure';
 import { Database } from '@/lib/database.types';
 
 type SupabaseMedicalCare = Database['public']['Tables']['medical_cares']['Row'];

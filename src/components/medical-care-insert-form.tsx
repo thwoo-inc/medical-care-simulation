@@ -18,12 +18,11 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { supabase } from '@/lib/supabase';
-import { useMedicalCareTemplateAll } from '@/hooks/use-medical-care-template-query';
-import { useQuery } from '@tanstack/react-query';
 import { TablesInsert } from '@/lib/database.types';
 import { useRouter } from 'next/navigation';
 import { useCreateMedicalCare } from '@/service/medical-care';
+import { useGetMedicalCareTemplates } from '@/service/medical-care-template';
+import Spinner from '@/components/spinner';
 
 type FormValues = {
   symptomId: string;
@@ -33,13 +32,8 @@ type FormValues = {
 
 export function MedicalCareInsertForm() {
   const router = useRouter();
-  const {
-    data: templates,
-    isLoading,
-    isError,
-  } = useQuery({
-    ...useMedicalCareTemplateAll({ client: supabase }),
-  });
+
+  const { data: tmpls, isPending, isError } = useGetMedicalCareTemplates();
 
   const form = useForm<FormValues>({
     defaultValues: {
@@ -50,20 +44,13 @@ export function MedicalCareInsertForm() {
 
   const { mutate } = useCreateMedicalCare();
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-  if (isError) {
-    return <div>Error</div>;
-  }
-
   // symptomが選択されたときの処理
   const onSymptomChange = (symptomId: string) => {
-    if (!templates) {
+    if (!tmpls) {
       return;
     }
 
-    const template = templates.find((t) => t.id === symptomId);
+    const template = tmpls.find((t) => t.id === symptomId);
     if (template) {
       const now = new Date();
       const timestamp = now.toLocaleString('ja-JP', {
@@ -83,10 +70,10 @@ export function MedicalCareInsertForm() {
 
   // フォム送信時の処理
   const onSubmit = async (data: FormValues) => {
-    if (!templates) {
+    if (!tmpls) {
       return;
     }
-    const template = templates.find((t) => t.id === data.symptomId);
+    const template = tmpls.find((t) => t.id === data.symptomId);
     if (!template) {
       return;
     }
@@ -104,62 +91,68 @@ export function MedicalCareInsertForm() {
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <FormField
-          control={form.control}
-          name="symptomId"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>テンプレート</FormLabel>
-              <Select
-                onValueChange={(value) => {
-                  field.onChange(value);
-                  onSymptomChange(value);
-                }}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="テンプレートを選択" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {templates &&
-                    templates.map((template) => (
-                      <SelectItem key={template.id} value={template.id}>
-                        {template.symptom}
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+    <>
+      {isPending && <Spinner />}
+      {isError && <p className="text-red-500">エラーが発生しました。</p>}
+      {!isPending && !isError && tmpls && (
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <FormField
+              control={form.control}
+              name="symptomId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>テンプレート</FormLabel>
+                  <Select
+                    onValueChange={(value) => {
+                      field.onChange(value);
+                      onSymptomChange(value);
+                    }}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="テンプレートを選択" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {tmpls &&
+                        tmpls.map((template) => (
+                          <SelectItem key={template.id} value={template.id}>
+                            {template.symptom}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        <FormField
-          control={form.control}
-          name="label"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>識別ラベル</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+            <FormField
+              control={form.control}
+              name="label"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>識別ラベル</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        <Button
-          type="submit"
-          className="text-center w-full"
-          disabled={form.getValues().symptomId === '' || form.getValues().label === ''}
-        >
-          シミュレーションを開始する
-        </Button>
-      </form>
-    </Form>
+            <Button
+              type="submit"
+              className="text-center w-full"
+              disabled={form.getValues().symptomId === '' || form.getValues().label === ''}
+            >
+              シミュレーションを開始する
+            </Button>
+          </form>
+        </Form>
+      )}
+    </>
   );
 }
 

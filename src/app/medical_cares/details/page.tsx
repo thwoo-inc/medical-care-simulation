@@ -1,6 +1,5 @@
 'use client';
 
-import { Procedure } from '@/types/medical-care-template';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useState } from 'react';
 import MedicalCareHeader from '@/components/medical-care-header';
@@ -18,6 +17,8 @@ import { ReportTabs } from '@/components/report-tabs';
 import { ReportDetail, ReportTimeline } from '@/types/report';
 import { MedicalCare } from '@/service/medical-care/type';
 import { durationTimeFormat } from '@/lib/date';
+import Spinner from '@/components/spinner';
+import { Procedure } from '@/types/procedure';
 
 function MedicalCareContent() {
   const router = useRouter();
@@ -33,15 +34,6 @@ function MedicalCareContent() {
   const [selectReport, setSelectReport] = useState(
     care?.finished_at ? ReportTimeline : ReportDetail,
   );
-
-  if (isPending) {
-    return <div>読み込み中...</div>;
-  }
-
-  if (isError) {
-    console.error('Error fetching medical care:');
-    return <div>エラーが発生しました。</div>;
-  }
 
   // 医療の更新
   const handleUpdateAny = async (updates: Partial<TablesUpdate<'medical_cares'>>) => {
@@ -75,8 +67,10 @@ function MedicalCareContent() {
   };
 
   return (
-    <div className="">
-      {care && (
+    <>
+      {isPending && <Spinner />}
+      {isError && <p className="text-red-500">エラーが発生しました。</p>}
+      {!isPending && !isError && care && (
         <div className="">
           <div className="sticky bg-white shadow top-0 z-0 flex justify-center items-center p-8 w-full flex-col space-y-4">
             <MedicalCareHeader care={care} onUpdate={handleUpdateAny} onDelete={handleDelete} />
@@ -95,7 +89,7 @@ function MedicalCareContent() {
           </section>
         </div>
       )}
-    </div>
+    </>
   );
 }
 

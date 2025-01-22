@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { durationTimeFormat } from '@/lib/date';
 import { cn } from '@/lib/utils';
 import { MedicalCare } from '@/service/medical-care/type';
-import { Procedure } from '@/types/medical-care-template';
+import { Procedure } from '@/types/procedure';
 import { useEffect, useState } from 'react';
 
 type ProcedureItemProps = {
