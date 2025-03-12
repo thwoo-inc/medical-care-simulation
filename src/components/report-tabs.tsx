@@ -9,7 +9,7 @@ type ReportTabsProps = {
 
 export function ReportTabs({ current, onChange }: ReportTabsProps) {
   return (
-    <Tabs value={current} onValueChange={onChange}>
+    <Tabs value={current} onValueChange={onChange} className="max-w-[480px]">
       <TabsList className="flex flex-wrap gap-2">
         {reportOrders.map((report) => (
           <TabsTrigger

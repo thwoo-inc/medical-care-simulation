@@ -85,7 +85,6 @@ export function MedicalCareInsertForm() {
 
     await mutate({ newCare });
 
-    console.log('create mutate success');
     form.reset();
     router.push(`/medical_cares/details?id=${data.id}`);
   };

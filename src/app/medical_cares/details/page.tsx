@@ -3,8 +3,6 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useState } from 'react';
 import MedicalCareHeader from '@/components/medical-care-header';
-import { DepartmentTabs } from '@/components/department-tabs';
-import { DepartmentALL, DepartmentObstetrics } from '@/types/department';
 import { phaseOrders } from '@/types/phase';
 import ProcedureItem from '@/components/procedure-item';
 import {
@@ -14,15 +12,16 @@ import {
 } from '@/service/medical-care';
 import { TablesUpdate } from '@/lib/database.types';
 import { ReportTabs } from '@/components/report-tabs';
-import { ReportDetail, ReportTimeline } from '@/types/report';
+import { ReportDepartment, ReportTimeline } from '@/types/report';
 import { MedicalCare } from '@/service/medical-care/type';
 import { durationTimeFormat } from '@/lib/date';
 import Spinner from '@/components/spinner';
 import { Procedure } from '@/types/procedure';
+import DepartmentIcon from '@/components/department-icon';
+import { Department } from '@/types/department';
 
 function MedicalCareContent() {
   const router = useRouter();
-  const [selectedDept, setSelectedDept] = useState(DepartmentObstetrics);
 
   const searchParams = useSearchParams();
   const id = searchParams.get('id');
@@ -32,7 +31,7 @@ function MedicalCareContent() {
   const { mutate: mutateDelete } = useDeleteMedicalCare();
 
   const [selectReport, setSelectReport] = useState(
-    care?.finished_at ? ReportTimeline : ReportDetail,
+    care?.finished_at ? ReportTimeline : ReportDepartment,
   );
 
   // 医療の更新
@@ -72,20 +71,14 @@ function MedicalCareContent() {
       {isError && <p className="text-red-500">エラーが発生しました。</p>}
       {!isPending && !isError && care && (
         <div className="">
-          <div className="sticky bg-white shadow top-0 z-0 flex justify-center items-center p-8 w-full flex-col space-y-4">
+          <div className="fixed bg-white top-0 w-full z-0 px-12 py-4 space-y-4 shadow overflow-x-hidden">
             <MedicalCareHeader care={care} onUpdate={handleUpdateAny} onDelete={handleDelete} />
-            {care.finished_at && <ReportTabs current={selectReport} onChange={setSelectReport} />}
-            <DepartmentTabs
-              procedures={care.procedures}
-              current={selectedDept}
-              onChange={setSelectedDept}
-            />
+            <ReportTabs current={selectReport} onChange={setSelectReport} />
           </div>
 
-          <section className="p-8">
-            {selectReport === ReportDetail &&
-              proceduresDetail(care, selectedDept, handleUpdateProcedure)}
-            {selectReport === ReportTimeline && proceduresTimeline(care, selectedDept)}
+          <section className="flex-1 p-4 overflow-x-auto pt-[360px] sm:pt-[280px]">
+            {selectReport === ReportDepartment && proceduresDepartment(care, handleUpdateProcedure)}
+            {selectReport === ReportTimeline && proceduresTimeline(care)}
           </section>
         </div>
       )}
@@ -93,49 +86,57 @@ function MedicalCareContent() {
   );
 }
 
-const proceduresDetail = (
+const proceduresDepartment = (
   care: MedicalCare,
-  selectedDept: string,
   onUpdate: { (proc: Procedure): Promise<void>; (proc: Procedure): void },
 ) => {
-  return phaseOrders.map((phase) => {
-    const procs = care.procedures.filter(
-      (proc) =>
-        proc.phase === phase &&
-        (selectedDept === DepartmentALL || proc.department === selectedDept),
-    );
+  // departmentごとの処置のマップ
+  const departmentProcedures = care.procedures.reduce((acc, proc) => {
+    if (!acc[proc.department]) {
+      acc[proc.department] = [];
+    }
+    acc[proc.department].push(proc);
+    return acc;
+  }, {} as { [key: string]: Procedure[] });
 
-    return procs.length > 0 ? (
-      <div key={phase} className="mb-8 space-y-4">
-        <h2
-          className="text-lg border-b-2 border-secondary-foreground inline-block font-bold"
-          key={phase}
-        >
-          {phase}
-        </h2>
-        <ul className="flex flex-col ml-4 gap-2">
-          {care.procedures
-            .filter(
-              (proc) =>
-                proc.phase === phase &&
-                (selectedDept === DepartmentALL || proc.department === selectedDept),
-            )
-            .map((p) => (
-              <li key={`${p.department}_${p.label}`}>
-                <ProcedureItem care={care} proc={p} onUpdate={onUpdate} />
-              </li>
-            ))}
-        </ul>
+  return (
+    <div className="space-y-2">
+      <div className="flex gap-4">
+        {Object.entries(departmentProcedures).map(([dept, deptProcs]) => (
+          <div key={dept} className="space-y-4">
+            <DepartmentIcon department={dept as Department} />
+
+            {phaseOrders.map((phase) => {
+              const phaseProcs = deptProcs.filter((proc) => proc.phase === phase);
+
+              return phaseProcs.length > 0 ? (
+                <div key={phase} className="mb-8 space-y-4">
+                  <h4
+                    className="text-lg border-b-2 border-secondary-foreground inline-block font-bold"
+                    key={phase}
+                  >
+                    {phase}
+                  </h4>
+                  <ul className="flex flex-col gap-2">
+                    {phaseProcs.map((p) => (
+                      <li key={`${p.department}_${p.label}`}>
+                        <ProcedureItem care={care} proc={p} onUpdate={onUpdate} />
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null;
+            })}
+          </div>
+        ))}
       </div>
-    ) : null;
-  });
+    </div>
+  );
 };
 
-const proceduresTimeline = (care: MedicalCare, selectedDept: string) => {
+const proceduresTimeline = (care: MedicalCare) => {
   const orderProcedures = care.procedures
-    .filter(
-      (p) => !!p.started_at && (selectedDept === DepartmentALL || p.department === selectedDept),
-    )
+    .filter((p) => !!p.started_at)
     .sort((a, b) => {
       const aDate = new Date(a.started_at as string);
       const bDate = new Date(b.started_at as string);
@@ -143,10 +144,7 @@ const proceduresTimeline = (care: MedicalCare, selectedDept: string) => {
     });
 
   return (
-    <div className="mb-8 space-y-4">
-      <h2 className="text-lg border-b-2 border-secondary-foreground inline-block font-bold">
-        時系列順
-      </h2>
+    <div className="space-y-4">
       <ul className="flex flex-col ml-4 gap-2">
         {orderProcedures.map((p) => (
           <li
@@ -156,7 +154,7 @@ const proceduresTimeline = (care: MedicalCare, selectedDept: string) => {
             <p className="w-20 text-right flex-0">
               {durationTimeFormat(new Date(care.started_at!), new Date(p.started_at!))}
             </p>
-            <p className="text-xs px-4 py-2 border-2 border-muted rounded-lg">{p.department}</p>
+            <DepartmentIcon department={p.department} />
             <p className="text-lg flex-1">{p.label}</p>
             {p.finished_at && (
               <p>{durationTimeFormat(new Date(p.started_at!), new Date(p.finished_at!))}で完了</p>

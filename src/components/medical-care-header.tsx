@@ -1,7 +1,6 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -60,38 +59,38 @@ export default function MedicalCareHeader({ care, onUpdate, onDelete }: Props) {
   };
 
   return (
-    <div className="flex flex-col items-center space-y-4 w-full">
-      <Card className={cn('p-4', care.finished_at ? 'bg-muted' : 'bg-red-100')}>
-        <h1 className={cn('text-lg')}>{care.label}</h1>
-      </Card>
+    <div className="flex flex-col items-center justify-center space-y-4 w-full max-w-[480px]">
+      <div
+        className={cn(
+          'p-4 w-full rounded-lg',
+          care.finished_at ? 'bg-state-done' : 'bg-state-doing',
+        )}
+      >
+        <h1 className={cn('text-lg font-bold overflow-hidden')}>{care.label}</h1>
+      </div>
 
-      <div className="flex justify-between items-center w-full">
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-2 w-full max-w-[480px]">
         <Button variant={'outline'} onClick={() => setIsCancelDialogOpen(true)}>
           {care.finished_at ? '治療の削除' : '治療の取りやめ'}
         </Button>
-        <div className="flex flex-col items-center gap-2">
-          <p className="text-muted-foreground">
-            {new Date(care.started_at!).toLocaleString()} 開始
+        <p className="text-muted-foreground">{new Date(care.started_at!).toLocaleString()} 開始</p>
+        <Button
+          onClick={() => setIsFinishDialogOpen(true)}
+          className={cn(care.finished_at && 'invisible')}
+        >
+          治療の完了
+        </Button>
+      </div>
+      <div className="flex justify-center">
+        {!care.finished_at ? (
+          <p className="text-red-600 font-bold">
+            <span className="text-xl">{elapsedTime}</span> 経過
           </p>
-          {care.finished_at && (
-            <p className="text-black text-xl font-bold">
-              {durationTimeFormat(new Date(care.started_at!), new Date(care.finished_at))} 完了
-            </p>
-          )}
-          {!care.finished_at && (
-            <p className="text-red-600 font-bold">
-              <span className="text-xl">{elapsedTime}</span> 経過
-            </p>
-          )}
-        </div>
-        <div>
-          <Button
-            onClick={() => setIsFinishDialogOpen(true)}
-            className={cn(care.finished_at && 'invisible')}
-          >
-            治療の完了
-          </Button>
-        </div>
+        ) : (
+          <p className="text-black text-xl font-bold">
+            {durationTimeFormat(new Date(care.started_at!), new Date(care.finished_at))} 完了
+          </p>
+        )}
       </div>
 
       <Dialog open={isCancelDialogOpen} onOpenChange={setIsCancelDialogOpen}>

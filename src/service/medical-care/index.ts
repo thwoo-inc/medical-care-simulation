@@ -87,8 +87,7 @@ export const useCreateMedicalCare = () => {
   const { mutate } = useMutation({
     mutationFn: (variables: { newCare: TablesInsert<'medical_cares'> }) =>
       createMedicalCare(variables.newCare),
-    onSuccess: (data) => {
-      console.log('create success: ', data);
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: medicalCareKeys.listsInProgress() });
       queryClient.invalidateQueries({ queryKey: medicalCareKeys.listsFinished() });
     },
@@ -104,10 +103,8 @@ export const useUpdateMedicalCare = () => {
     mutationFn: (variables: { id: string; updates: Partial<TablesUpdate<'medical_cares'>> }) =>
       updateMedicalCare(variables.id, variables.updates),
     onSuccess: (data, variables) => {
-      console.log('update success id: ', variables.id);
       queryClient.invalidateQueries({ queryKey: medicalCareKeys.detail(variables.id) });
       if ('finished_at' in variables.updates) {
-        console.log('update key finished_at');
         queryClient.invalidateQueries({ queryKey: medicalCareKeys.listsInProgress() });
         queryClient.invalidateQueries({ queryKey: medicalCareKeys.listsFinished() });
       }
@@ -128,8 +125,7 @@ export const useDeleteMedicalCare = () => {
       }
       return response.data;
     }, // deleteMedicalCare関数を呼び出す
-    onSuccess: (data, id) => {
-      console.log('delete success id: ', id);
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: medicalCareKeys.listsInProgress() });
       queryClient.invalidateQueries({ queryKey: medicalCareKeys.listsFinished() });
     },

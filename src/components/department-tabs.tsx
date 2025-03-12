@@ -1,7 +1,8 @@
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { DepartmentALL, departmentOrders } from '@/types/department';
+import { Department, departmentOrders } from '@/types/department';
 import { cn } from '@/lib/utils';
 import { Procedure } from '@/types/procedure';
+import { deptBgColor } from '@/lib/color';
 
 type DepartmentTabsProps = {
   procedures: Procedure[];
@@ -14,19 +15,13 @@ export function DepartmentTabs({ procedures, current, onChange }: DepartmentTabs
   const availableDepartments = departmentOrders.filter((dept) =>
     procedures.some((proc) => proc.department === dept),
   );
-  // DepartmentALLを先頭に追加
-  availableDepartments.unshift(DepartmentALL);
 
   return (
     <Tabs value={current} onValueChange={onChange}>
       <TabsList className="flex flex-wrap gap-2">
         {availableDepartments.map((dept) => (
-          <TabsTrigger
-            key={dept}
-            value={dept}
-            className={cn(current === dept ? 'bg-primary text-primary-foreground' : '')}
-          >
-            {dept === '助産師/看護師' ? 'スタッフ' : dept}
+          <TabsTrigger key={dept} value={dept} className={cn(deptBgColor[dept as Department])}>
+            {dept}
           </TabsTrigger>
         ))}
       </TabsList>

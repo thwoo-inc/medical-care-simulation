@@ -2,7 +2,6 @@ import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarGroup,
   // SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
@@ -34,27 +33,25 @@ const items = [
 export function AppSidebar() {
   return (
     <Sidebar>
-      <SidebarHeader>
-        <p className="text-lg my-8 font-bold">医療シミュレーション</p>
+      <SidebarHeader className="p-4">
+        <p className="text-lg my-4 font-bold">医療シミュレーション</p>
       </SidebarHeader>
-      <SidebarContent>
-        <SidebarGroup>
-          {/* <SidebarGroupLabel className="text-lg my-8 font-bold">
+      <SidebarContent className="p-4">
+        {/* <SidebarGroupLabel className="text-lg my-8 font-bold">
             医療シミュレーション
           </SidebarGroupLabel> */}
-          <SidebarMenu className="space-y-4">
-            {items.map((item) => (
-              <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton asChild>
-                  <Link href={item.url}>
-                    <item.icon className="size-8" />
-                    <span>{item.title}</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
-        </SidebarGroup>
+        <SidebarMenu className="space-y-4">
+          {items.map((item) => (
+            <SidebarMenuItem key={item.title}>
+              <SidebarMenuButton asChild>
+                <Link href={item.url} className="px-4 py-2 rounded bg-white text-lg">
+                  <item.icon className="lg" />
+                  <span>{item.title}</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
       </SidebarContent>
       <SidebarFooter />
     </Sidebar>
