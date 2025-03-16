@@ -1,8 +1,7 @@
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Department, departmentOrders } from '@/types/department';
-import { cn } from '@/lib/utils';
 import { Procedure } from '@/types/procedure';
-import { deptBgColor } from '@/lib/color';
+import { DepartmentSpan } from '@/components/department-icon';
 
 type DepartmentTabsProps = {
   procedures: Procedure[];
@@ -12,16 +11,16 @@ type DepartmentTabsProps = {
 
 export function DepartmentTabs({ procedures, current, onChange }: DepartmentTabsProps) {
   // proceduresに存在する診療科のみをフィルタリング
-  const availableDepartments = departmentOrders.filter((dept) =>
+  const departments = departmentOrders.filter((dept) =>
     procedures.some((proc) => proc.department === dept),
   );
 
   return (
     <Tabs value={current} onValueChange={onChange}>
       <TabsList className="flex flex-wrap gap-2">
-        {availableDepartments.map((dept) => (
-          <TabsTrigger key={dept} value={dept} className={cn(deptBgColor[dept as Department])}>
-            {dept}
+        {departments.map((dept) => (
+          <TabsTrigger key={dept} value={dept}>
+            {<DepartmentSpan department={dept as Department} />}
           </TabsTrigger>
         ))}
       </TabsList>

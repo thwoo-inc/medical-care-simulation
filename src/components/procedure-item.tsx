@@ -2,10 +2,11 @@
 
 import Spinner from '@/components/spinner';
 import { Button } from '@/components/ui/button';
-import { durationTimeFormat } from '@/lib/date';
+import { durationTimeFormatMS } from '@/lib/date';
 import { cn } from '@/lib/utils';
 import { MedicalCare } from '@/service/medical-care/type';
 import { Procedure } from '@/types/procedure';
+import { Check, Play, Undo2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 type ProcedureItemProps = {
@@ -20,10 +21,10 @@ export default function ProcedureItem({ care, proc, onUpdate }: ProcedureItemPro
 
   // 経過時間を計算して更新する
   useEffect(() => {
-    if (!proc.started_at) return;
+    if (!proc.started_at || proc.hasStartOnly) return;
 
     const updateElapsedTime = () => {
-      const formatted = durationTimeFormat(
+      const formatted = durationTimeFormatMS(
         new Date(proc.started_at!),
         proc.finished_at ? new Date(proc.finished_at) : new Date(),
       );
@@ -33,22 +34,22 @@ export default function ProcedureItem({ care, proc, onUpdate }: ProcedureItemPro
     // 必ず初回実行
     updateElapsedTime();
     // 終了してなければ1秒ごとに更新
-    if (!proc.finished_at) {
+    if (!care.finished_at && !proc.finished_at) {
       const intervalId = setInterval(updateElapsedTime, 1000);
       return () => clearInterval(intervalId);
     }
-  }, [proc?.started_at, proc?.finished_at]);
+  }, [proc.started_at, proc.finished_at, proc.hasStartOnly, care.finished_at]);
 
   const isWill = !proc.started_at;
-  const isDoing = proc.started_at && !proc.finished_at;
-  const isDone = proc.finished_at;
+  const isDoing = proc.started_at && !proc.hasStartOnly && !proc.finished_at;
+  const isDone = (proc.started_at && proc.hasStartOnly) || proc.finished_at;
   // const isCareDone = care.finished_at;
 
   return (
     <div
       key={proc.label}
       className={cn(
-        'p-2 space-y-2 border border-primary rounded w-[240px]',
+        'p-2 space-y-2 border-2 rounded w-[240px]',
         isWill ? 'bg-state-will' : isDoing ? 'bg-state-doing' : 'bg-state-done',
       )}
     >
@@ -59,14 +60,14 @@ export default function ProcedureItem({ care, proc, onUpdate }: ProcedureItemPro
       <div className="text-sm">
         {isWill && <p>{proc.details}</p>}
         {(isDoing || isDone) && (
-          <p className="text-right">{`治療${durationTimeFormat(
-            new Date(care.started_at || ''),
-            new Date(proc.started_at || ''),
-          )} に開始`}</p>
-        )}
-        {(isDoing || isDone) && (
           <p className="text-right">
-            {elapsedTime} {isDoing ? '経過' : '完了'}
+            {`${durationTimeFormatMS(
+              new Date(care.started_at || ''),
+              new Date(proc.started_at || ''),
+            )} ${proc.hasStartOnly ? '実施' : '開始'}`}
+            {!proc.hasStartOnly && (isDoing || isDone) && (
+              <span className="ml-1">{`(${elapsedTime}${isDoing ? '経過' : 'で終了'})`}</span>
+            )}
           </p>
         )}
       </div>
@@ -74,7 +75,7 @@ export default function ProcedureItem({ care, proc, onUpdate }: ProcedureItemPro
       {!care.finished_at && (
         <div className="flex justify-between">
           <Button
-            variant="secondary"
+            variant="outline"
             className={cn(!proc.started_at && 'invisible')}
             onClick={async () => {
               setUpdating(true);
@@ -88,10 +89,19 @@ export default function ProcedureItem({ care, proc, onUpdate }: ProcedureItemPro
               setUpdating(false);
             }}
           >
-            {updating ? <Spinner /> : '戻す'}
+            {updating ? (
+              <Spinner />
+            ) : (
+              <>
+                戻す
+                <Undo2 />
+              </>
+            )}
           </Button>
           <Button
-            className={cn(proc.finished_at && 'invisible')}
+            className={cn(
+              (proc.finished_at || (proc.hasStartOnly && proc.started_at)) && 'invisible',
+            )}
             onClick={async () => {
               setUpdating(true);
               await onUpdate(
@@ -104,7 +114,28 @@ export default function ProcedureItem({ care, proc, onUpdate }: ProcedureItemPro
               setUpdating(false);
             }}
           >
-            {updating ? <Spinner /> : !proc.started_at ? '開始' : '完了'}
+            {updating ? (
+              <Spinner />
+            ) : !proc.started_at ? (
+              proc.hasStartOnly ? (
+                <>
+                  実施
+                  <Check />
+                </>
+              ) : (
+                <>
+                  開始
+                  <Play />
+                </>
+              )
+            ) : (
+              !proc.hasStartOnly && (
+                <>
+                  終了
+                  <Check />
+                </>
+              )
+            )}
           </Button>
         </div>
       )}

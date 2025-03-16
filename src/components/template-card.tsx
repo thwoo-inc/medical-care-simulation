@@ -1,10 +1,11 @@
 import { DepartmentTabs } from '@/components/department-tabs';
 import { Card } from '@/components/ui/card';
 import { MedicalCareTemplate } from '@/service/medical-care-template/type';
-import { DepartmentObstetrics } from '@/types/department';
+import { Department, DepartmentObstetrics } from '@/types/department';
 import { Procedure } from '@/types/procedure';
 import React, { useMemo, useState } from 'react';
 import { ChevronsDown, ChevronsUp } from 'lucide-react';
+import { DepartmentSpan } from '@/components/department-icon';
 
 export default function TemplateCard({ t }: { t: MedicalCareTemplate }) {
   const [selectedDept, setSelectedDept] = useState(DepartmentObstetrics);
@@ -21,9 +22,10 @@ export default function TemplateCard({ t }: { t: MedicalCareTemplate }) {
     <Card key={t.id} className="p-4 bg-muted flex flex-col">
       <h2 className="text-lg my-2">{t.symptom}</h2>
       <div className="flex flex-wrap gap-2 my-2">
-        {Object.entries(departmentCounts).map(([department, count]) => (
-          <p key={department} className="text-sm">
-            {department}:{count}件
+        {Object.entries(departmentCounts).map(([dept, count]) => (
+          <p key={dept} className="text-sm">
+            {<DepartmentSpan department={dept as Department} />}
+            {count}件
           </p>
         ))}
       </div>

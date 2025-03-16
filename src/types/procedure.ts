@@ -7,4 +7,5 @@ export type Procedure = {
   details: string;
   started_at?: string;
   finished_at?: string;
+  hasStartOnly?: boolean; // 開始のみをもつ＝実行したかどうかだけの記録とみなす
 };

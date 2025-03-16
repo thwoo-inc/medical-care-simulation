@@ -23,6 +23,7 @@ import { useRouter } from 'next/navigation';
 import { useCreateMedicalCare } from '@/service/medical-care';
 import { useGetMedicalCareTemplates } from '@/service/medical-care-template';
 import Spinner from '@/components/spinner';
+import { toast } from 'sonner';
 
 type FormValues = {
   symptomId: string;
@@ -84,6 +85,7 @@ export function MedicalCareInsertForm() {
     });
 
     await mutate({ newCare });
+    toast.info('医療記録を開始作しました');
 
     form.reset();
     router.push(`/medical_cares/details?id=${data.id}`);

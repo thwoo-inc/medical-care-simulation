@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import RootUseClient from '@/components/root-user-client';
+import { Toaster } from 'sonner';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -15,7 +16,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: '医療シミュレーション',
-  description: '山口大学医学部で実施するシミュレーション用Webアプリです',
+  description: '山口大学医学部で実施する医療シミュレーション用Webアプリです',
 };
 
 export default function RootLayout({
@@ -27,6 +28,7 @@ export default function RootLayout({
     <html lang="ja">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <RootUseClient>{children}</RootUseClient>
+        <Toaster position="top-right" />
       </body>
     </html>
   );
