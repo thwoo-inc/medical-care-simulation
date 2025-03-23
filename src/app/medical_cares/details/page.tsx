@@ -26,7 +26,7 @@ function MedicalCareContent() {
       {isError && <p className="text-red-500">エラーが発生しました。</p>}
       {!isPending && !isError && care && (
         <div className="relative overflow-x-clip">
-          <div className="sticky overflow-x-hidden bg-white top-0 z-0 pl-16 py-4 space-y-4 shadow-md">
+          <div className="sticky overflow-x-hidden bg-white top-0 z-0 px-4 sm:pl-16 py-4 space-y-4 shadow-md">
             <MedicalCareHeader care={care} />
             <ReportTabs current={selectReport} onChange={setSelectReport} />
           </div>

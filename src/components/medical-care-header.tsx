@@ -74,7 +74,7 @@ export default function MedicalCareHeader({ care }: { care: MedicalCare }) {
           care.finished_at ? 'bg-state-done' : 'bg-state-doing',
         )}
       >
-        <h1 className={cn('text-lg font-bold')}>{care.label}</h1>
+        <h1 className={cn('text-lg text-center font-bold')}>{care.label}</h1>
       </div>
 
       <div className="flex flex-col sm:flex-row justify-between items-center gap-2 w-full max-w-[480px]">
