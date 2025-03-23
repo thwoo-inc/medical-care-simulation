@@ -17,7 +17,7 @@ export default function Page() {
       {!isPending && !isError && cares && (
         <div className="flex flex-col items-center justify-center w-full relative space-y-8 p-8">
           <div className="">
-            <h1 className="flex items-center gap-2 text-2xl my-8">
+            <h1 className="flex items-center gap-2 font-bold text-2xl my-8">
               <BriefcaseMedical />
               過去の取り組み
             </h1>

@@ -85,7 +85,7 @@ export function MedicalCareInsertForm() {
     });
 
     await mutate({ newCare });
-    toast.info('医療記録を開始作しました');
+    toast.info('医療記録を開始しました');
 
     form.reset();
     router.push(`/medical_cares/details?id=${data.id}`);

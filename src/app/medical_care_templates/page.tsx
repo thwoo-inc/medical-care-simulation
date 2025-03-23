@@ -23,11 +23,13 @@ export default function Page() {
             <ClipboardList />
             テンプレート
           </h1>
-          {tmpls.map((t) => (
-            <div key={t.id}>
-              <TemplateCard t={t} />
-            </div>
-          ))}
+          <ul className="w-full space-y-4">
+            {tmpls.map((t) => (
+              <li key={t.id}>
+                <TemplateCard t={t} />
+              </li>
+            ))}
+          </ul>
         </>
       )}
     </div>

@@ -1,9 +1,16 @@
 'use client';
 
-import { MedicalCareDialog } from '@/components/medical-care-insert-dialog';
+import { MedicalCareInsertForm } from '@/components/medical-care-insert-form';
 import Spinner from '@/components/spinner';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { useGetMedicalCaresInProgress } from '@/service/medical-care';
 import { Hospital, Plus } from 'lucide-react';
 import Link from 'next/link';
@@ -18,7 +25,7 @@ export default function Page() {
       {isError && <p className="text-red-500">エラーが発生しました。</p>}
       {!isPending && !isError && cares && (
         <>
-          <h1 className="text-2xl my-8 flex items-center gap-2">
+          <h1 className="text-2xl my-8 flex font-bold items-center gap-2">
             <Hospital />
             ホーム
           </h1>
@@ -36,12 +43,21 @@ export default function Page() {
               </ul>
             )}
           </section>
-          <MedicalCareDialog>
-            <Button variant={'outline'} className="p-8">
-              <Plus />
-              新規シミュレーション
-            </Button>
-          </MedicalCareDialog>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant={'outline'} className="p-8">
+                <Plus />
+                新規シミュレーション
+              </Button>
+            </DialogTrigger>
+            <DialogContent aria-describedby={undefined}>
+              <DialogTitle className="text-center">新規シミュレーション</DialogTitle>
+              <DialogDescription className="text-center">
+                テンプレートを選択して開始してください
+              </DialogDescription>
+              <MedicalCareInsertForm />
+            </DialogContent>
+          </Dialog>
         </>
       )}
     </div>

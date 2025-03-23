@@ -12,6 +12,52 @@ import {
 } from '@/types/department';
 import React from 'react';
 
+export function DepartmentBgColor(department: Department) {
+  switch (department) {
+    case DepartmentObstetrics:
+      return 'bg-dept-obstertrics-p';
+    case DepartmentNICU:
+      return 'bg-dept-nicu-p';
+    case DepartmentAnesthesiology:
+      return 'bg-dept-anesthesiology-p';
+    case DepartmentICU:
+      return 'bg-dept-icu-p';
+    case DepartmentAMEC3:
+      return 'bg-dept-amec3-p';
+    case DepartmentCardiology:
+      return 'bg-dept-cardiology-p';
+    case DepartmentStaff:
+      return 'bg-dept-staff-p';
+    case DepartmentEmergency:
+      return 'bg-dept-emergency-p';
+    default:
+      return 'bg-muted';
+  }
+}
+
+export function DepartmentBorderColor(department: Department) {
+  switch (department) {
+    case DepartmentObstetrics:
+      return 'border-dept-obstertrics-p';
+    case DepartmentNICU:
+      return 'border-dept-nicu-p';
+    case DepartmentAnesthesiology:
+      return 'border-dept-anesthesiology-p';
+    case DepartmentICU:
+      return 'border-dept-icu-p';
+    case DepartmentAMEC3:
+      return 'border-dept-amec3-p';
+    case DepartmentCardiology:
+      return 'border-dept-cardiology-p';
+    case DepartmentStaff:
+      return 'border-dept-staff-p';
+    case DepartmentEmergency:
+      return 'border-dept-emergency-p';
+    default:
+      return 'border-muted';
+  }
+}
+
 export function DepartmentSpan({ department }: { department: Department }) {
   const common = 'p-1 rounded';
   switch (department) {
