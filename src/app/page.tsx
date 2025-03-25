@@ -20,7 +20,6 @@ export default function Page() {
 
   return (
     <div className="flex flex-col items-center justify-center relative space-y-8 p-8">
-      {/* <div className="flex flex-col items-center justify-center min-h-screen relative space-y-8"> */}
       {isPending && <Spinner />}
       {isError && <p className="text-red-500">エラーが発生しました。</p>}
       {!isPending && !isError && cares && (

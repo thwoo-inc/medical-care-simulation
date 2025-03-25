@@ -10,7 +10,6 @@ export default function Page() {
   const { data: cares, isPending, isError } = useGetMedicalCaresFinished();
 
   return (
-    // <div className="flex flex-col items-center justify-center w-full min-h-screen relative space-y-8">
     <>
       {isPending && <Spinner />}
       {isError && <p className="text-red-500">エラーが発生しました。</p>}

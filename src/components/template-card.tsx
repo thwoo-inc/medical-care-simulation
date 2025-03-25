@@ -22,14 +22,12 @@ import { toast } from 'sonner';
 import { MedicalCareTemplateEditForm } from '@/components/medical-care-template-edit-form';
 
 export default function TemplateCard({ t }: { t: MedicalCareTemplate }) {
-  // const router = useRouter();
   const [selectedDept, setSelectedDept] = useState(DepartmentObstetrics);
   const [isAccordionOpen, setIsAccordionOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isCopyDialogOpen, setIsCopyDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  // const { mutate: mutateUpdate } = useUpdateMedicalCare();
   const { mutate: mutateDelete } = useDeleteMedicalCareTemplate();
 
   const departmentCounts = useMemo(() => {
@@ -43,7 +41,6 @@ export default function TemplateCard({ t }: { t: MedicalCareTemplate }) {
   const handleDelete = async () => {
     await mutateDelete({ id: t.id });
     toast.success('テンプレートを削除しました');
-    // router.reload();
   };
 
   return (

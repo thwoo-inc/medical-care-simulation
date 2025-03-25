@@ -1,9 +1,8 @@
-import { DepartmentParagraph, DepartmentSpan } from '@/components/department-icon';
+import { DepartmentParagraph } from '@/components/department-icon';
 import ProcedureItem from '@/components/procedure-item';
 import { useUpdateMedicalCare } from '@/service/medical-care';
 import { MedicalCare } from '@/service/medical-care/type';
 import { Department, departmentOrders } from '@/types/department';
-import { phaseOrders } from '@/types/phase';
 import { Procedure, procedureSteps } from '@/types/procedure';
 import React from 'react';
 

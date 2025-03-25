@@ -56,7 +56,6 @@ export function MedicalCareTemplateEditForm({
     toast.info('テンプレートをコピーしました');
 
     form.reset();
-    // router.push(`/medical_care_templates/`);
     closeDialog();
   };
 
