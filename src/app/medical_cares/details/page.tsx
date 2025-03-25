@@ -5,10 +5,11 @@ import { Suspense, useState } from 'react';
 import MedicalCareHeader from '@/components/medical-care-header';
 import { useGetMedicalCare } from '@/service/medical-care';
 import { ReportTabs } from '@/components/report-tabs';
-import { ReportDepartment, ReportTimeline } from '@/types/report';
+import { ReportDepartment, ReportMemo, ReportTimeline } from '@/types/report';
 import Spinner from '@/components/spinner';
-import ProdedureDepartment from '@/components/procedure-department';
+import ProdedureMap from '@/components/procedure-map';
 import ProcedureTimeline from '@/components/procedure-timeline';
+import { MedicalCareMemoForm } from '@/components/medical-care-memo-form';
 
 function MedicalCareContent() {
   const searchParams = useSearchParams();
@@ -17,7 +18,7 @@ function MedicalCareContent() {
   const { data: care, isPending, isError } = useGetMedicalCare(id || '');
 
   const [selectReport, setSelectReport] = useState(
-    care?.finished_at ? ReportTimeline : ReportDepartment,
+    care?.finished_at ? ReportMemo : ReportDepartment,
   );
 
   return (
@@ -32,8 +33,9 @@ function MedicalCareContent() {
           </div>
 
           <section className="p-4">
-            {selectReport === ReportDepartment && <ProdedureDepartment care={care} />}
+            {selectReport === ReportDepartment && <ProdedureMap care={care} />}
             {selectReport === ReportTimeline && <ProcedureTimeline care={care} />}
+            {selectReport === ReportMemo && <MedicalCareMemoForm care={care} />}
           </section>
         </div>
       )}

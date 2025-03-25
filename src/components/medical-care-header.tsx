@@ -84,7 +84,7 @@ export default function MedicalCareHeader({ care }: { care: MedicalCare }) {
         <p className="text-muted-foreground">{new Date(care.started_at!).toLocaleString()} 開始</p>
         <Button
           onClick={() => setIsFinishDialogOpen(true)}
-          className={cn(care.finished_at && 'invisible')}
+          className={cn(care.finished_at && 'hidden sm:inline invisible')}
         >
           治療の完了
         </Button>

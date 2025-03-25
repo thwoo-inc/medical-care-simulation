@@ -107,6 +107,9 @@ export const useUpdateMedicalCare = () => {
       if ('finished_at' in variables.updates) {
         queryClient.invalidateQueries({ queryKey: medicalCareKeys.listsInProgress() });
         queryClient.invalidateQueries({ queryKey: medicalCareKeys.listsFinished() });
+      } else if ('memo' in variables.updates) {
+        queryClient.invalidateQueries({ queryKey: medicalCareKeys.listsFinished() });
+        queryClient.invalidateQueries({ queryKey: medicalCareKeys.detail(variables.id) });
       }
     },
   });

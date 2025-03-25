@@ -61,6 +61,7 @@ export type Database = {
           finished_at: string | null
           id: string
           label: string
+          memo: string
           procedures: Json | null
           started_at: string | null
           symptom: string
@@ -70,6 +71,7 @@ export type Database = {
           finished_at?: string | null
           id: string
           label: string
+          memo?: string
           procedures?: Json | null
           started_at?: string | null
           symptom: string
@@ -79,6 +81,7 @@ export type Database = {
           finished_at?: string | null
           id?: string
           label?: string
+          memo?: string
           procedures?: Json | null
           started_at?: string | null
           symptom?: string

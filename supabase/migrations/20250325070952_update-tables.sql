@@ -1,0 +1,2 @@
+ALTER TABLE medical_cares
+ADD COLUMN memo TEXT NOT NULL DEFAULT '';

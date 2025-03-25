@@ -1,28 +1,26 @@
 export const DepartmentObstetrics = '産科';
+export const DepartmentStaff = 'スタッフ';
 export const DepartmentNICU = 'NICU';
 export const DepartmentAnesthesiology = '麻酔科';
+export const DepartmentCardiology = '循環器内科ME';
 export const DepartmentICU = 'ICU';
 export const DepartmentAMEC3 = 'AMEC3';
-export const DepartmentCardiology = '循環器内科ME';
-export const DepartmentStaff = '助産師/看護師';
-export const DepartmentEmergency = '救急科';
 
 export type Department =
   | typeof DepartmentObstetrics
+  | typeof DepartmentStaff
   | typeof DepartmentNICU
   | typeof DepartmentAnesthesiology
-  | typeof DepartmentICU
-  | typeof DepartmentAMEC3
   | typeof DepartmentCardiology
-  | typeof DepartmentStaff
-  | typeof DepartmentEmergency;
+  | typeof DepartmentICU
+  | typeof DepartmentAMEC3;
 
 export const departmentOrders = [
   DepartmentObstetrics,
-  DepartmentAnesthesiology,
+  DepartmentStaff,
   DepartmentNICU,
+  DepartmentAnesthesiology,
+  DepartmentCardiology,
   DepartmentICU,
   DepartmentAMEC3,
-  DepartmentCardiology,
-  DepartmentStaff,
 ];

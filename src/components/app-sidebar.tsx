@@ -37,16 +37,13 @@ export function AppSidebar() {
         <p className="text-lg my-4 font-bold">医療シミュレーション</p>
       </SidebarHeader>
       <SidebarContent className="p-4">
-        {/* <SidebarGroupLabel className="text-lg my-8 font-bold">
-            医療シミュレーション
-          </SidebarGroupLabel> */}
         <SidebarMenu className="space-y-4">
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton asChild>
-                <Link href={item.url} className="px-4 py-2 rounded bg-white text-lg">
-                  <item.icon className="lg" />
-                  <span>{item.title}</span>
+                <Link href={item.url} className="px-4 py-2 rounded bg-white">
+                  <item.icon className="24" />
+                  <span className="text-lg">{item.title}</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>

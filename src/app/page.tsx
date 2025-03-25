@@ -36,7 +36,7 @@ export default function Page() {
                 {cares.map((care) => (
                   <Card key={care.id} className="p-4 bg-red-100 flex flex-col">
                     <Link href={`/medical_cares/details?id=${care.id}`}>
-                      <p className="">{care.label}</p>
+                      <p className="font-bold text-lg">{care.label}</p>
                     </Link>
                   </Card>
                 ))}
