@@ -15,9 +15,7 @@ export default function ProdedureStatusMap({ care }: { care: MedicalCare }) {
     if (!care) {
       return;
     }
-    const newProcedures = care.procedures.map((p) =>
-      p.label === proc.label && p.department === proc.department ? proc : p,
-    );
+    const newProcedures = care.procedures.map((p) => (p.id === proc.id ? proc : p));
     mutateUpdate({ id: care.id, updates: { procedures: newProcedures } });
   };
 
