@@ -8,7 +8,7 @@ import {
   DepartmentNICU,
   DepartmentObstetrics,
   DepartmentStaff,
-} from '@/types/department';
+} from '@/types/procedure';
 import React from 'react';
 
 export function DepartmentBgColor(department: Department) {

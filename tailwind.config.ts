@@ -78,8 +78,8 @@ export default {
         'dept-icu-p': '#A8D5EB',
         'dept-amec3-v': '#8E44AD',
         'dept-amec3-p': '#D9B8E6',
-        // 'dept-vacant-v': '#D7263D',
-        // 'dept-vacant-p': '#F4C4CE',
+        'dept-all-v': '#D7263D',
+        'dept-all-p': '#F4C4CE',
       },
       borderRadius: {
         lg: 'var(--radius)',

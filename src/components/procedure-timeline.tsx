@@ -52,10 +52,7 @@ export default function ProcedureTimeline({ care }: { care: MedicalCare }) {
       )}
       <ul className="flex flex-col gap-2 w-full mr-auto">
         {orderProcedures.map((p) => (
-          <li
-            key={`${p.department}_${p.label}`}
-            className="flex items-center gap-4 justify-between"
-          >
+          <li key={p.id} className="flex items-center gap-4 justify-between">
             <p className="w-20 text-right text-sm flex-0">
               {durationTimeFormatMS(new Date(care.started_at!), new Date(p.started_at!))}
             </p>

@@ -7,11 +7,11 @@ import { useGetMedicalCare } from '@/service/medical-care';
 import { ReportTabs } from '@/components/report-tabs';
 import { ReportDepartment, ReportMemo, ReportTimeline } from '@/types/report';
 import Spinner from '@/components/spinner';
-import ProdedureMap from '@/components/procedure-map';
 import ProcedureTimeline from '@/components/procedure-timeline';
 import { MedicalCareMemoForm } from '@/components/medical-care-memo-form';
+import ProdedureStatusMap from '@/components/procedure-status-map';
 
-function MedicalCareContent() {
+function MedicalCarePage() {
   const searchParams = useSearchParams();
   const id = searchParams.get('id');
 
@@ -33,7 +33,7 @@ function MedicalCareContent() {
           </div>
 
           <section className="p-4">
-            {selectReport === ReportDepartment && <ProdedureMap care={care} />}
+            {selectReport === ReportDepartment && <ProdedureStatusMap care={care} />}
             {selectReport === ReportTimeline && <ProcedureTimeline care={care} />}
             {selectReport === ReportMemo && <MedicalCareMemoForm care={care} />}
           </section>
@@ -44,10 +44,10 @@ function MedicalCareContent() {
 }
 
 // ページコンポーネント
-export default function MedicalCarePage() {
+export default function Page() {
   return (
     <Suspense fallback={<div>読み込み中...</div>}>
-      <MedicalCareContent />
+      <MedicalCarePage />
     </Suspense>
   );
 }

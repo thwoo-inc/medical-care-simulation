@@ -44,9 +44,9 @@ export default function Page() {
           </section>
           <Dialog>
             <DialogTrigger asChild>
-              <Button variant={'outline'} className="p-8">
-                <Plus />
+              <Button className="p-8 text-base">
                 新規シミュレーション
+                <Plus />
               </Button>
             </DialogTrigger>
             <DialogContent aria-describedby={undefined}>

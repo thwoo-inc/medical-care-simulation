@@ -1,12 +1,13 @@
 import { DepartmentParagraph } from '@/components/department-icon';
-import ProcedureItem from '@/components/procedure-item';
+import ProcedureStatusItem from '@/components/procedure-status-item';
+import StepHeadline from '@/components/step-headline';
 import { useUpdateMedicalCare } from '@/service/medical-care';
 import { MedicalCare } from '@/service/medical-care/type';
-import { Department, departmentOrders } from '@/types/department';
+import { Department, departmentOrders } from '@/types/procedure';
 import { Procedure, procedureSteps } from '@/types/procedure';
 import React from 'react';
 
-export default function ProdedureMap({ care }: { care: MedicalCare }) {
+export default function ProdedureStatusMap({ care }: { care: MedicalCare }) {
   const { mutate: mutateUpdate } = useUpdateMedicalCare();
 
   // 処置の更新
@@ -31,8 +32,8 @@ export default function ProdedureMap({ care }: { care: MedicalCare }) {
         // ステップごとの処置
         const targetProcedures = care.procedures.filter((proc) => proc.step === step);
         return (
-          <div key={step} className="mb-8">
-            <h2 className="text-xl font-bold border-b-4 my-4">ステップ{step}</h2>
+          <div key={step} className="mb-4 w-full">
+            <StepHeadline step={step} />
             <div key={step} className="flex gap-4">
               {workingDepartment.map((dept) => (
                 <div key={dept} className="space-y-2">
@@ -44,8 +45,12 @@ export default function ProdedureMap({ care }: { care: MedicalCare }) {
                     {targetProcedures
                       .filter((proc) => proc.department === dept)
                       .map((p) => (
-                        <li key={`${p.department}_${p.label}`} className="w-[200px]">
-                          <ProcedureItem care={care} proc={p} onUpdate={handleUpdateProcedure} />
+                        <li key={p.id} className="w-[200px]">
+                          <ProcedureStatusItem
+                            care={care}
+                            proc={p}
+                            onUpdate={handleUpdateProcedure}
+                          />
                         </li>
                       ))}
                   </ul>

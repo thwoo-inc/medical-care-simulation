@@ -3,11 +3,16 @@ import { TablesInsert, TablesUpdate } from '@/lib/database.types';
 import {
   createMedicalCareTemplate,
   deleteMedicalCareTemplate,
+  getMedicalCareTemplate,
   getMedicalCareTemplates,
   updateMedicalCareTemplate,
+  upsertMedicalCareTemplate,
 } from '@/service/medical-care-template/function';
 import { medicalCareTemplateKeys } from '@/service/medical-care-template/key';
-import { getMedicalCareTemplatesSelector } from '@/service/medical-care-template/selector';
+import {
+  getMedicalCareTemplateSelector,
+  getMedicalCareTemplatesSelector,
+} from '@/service/medical-care-template/selector';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export const useGetMedicalCareTemplates = () => {
@@ -34,28 +39,28 @@ export const useGetMedicalCareTemplates = () => {
   };
 };
 
-// export const useGetMedicalCareTemplate = (id: string) => {
-//   const auth = useAuth();
+export const useGetMedicalCareTemplate = (id: string) => {
+  const auth = useAuth();
 
-//   const { data, isPending, isError } = useQuery({
-//     queryKey: medicalCareTemplateKeys.detail(id),
-//     queryFn: async () => {
-//       const response = await getMedicalCareTemplateTemplate(id);
-//       if (response.error) {
-//         throw new Error(response.error.message);
-//       }
-//       return response.data;
-//     },
-//     select: getMedicalCareTemplateTemplateSelector,
-//     enabled: !!auth.session,
-//   });
+  const { data, isPending, isError } = useQuery({
+    queryKey: medicalCareTemplateKeys.detail(id),
+    queryFn: async () => {
+      const response = await getMedicalCareTemplate(id);
+      if (response.error) {
+        throw new Error(response.error.message);
+      }
+      return response.data;
+    },
+    select: getMedicalCareTemplateSelector,
+    enabled: !!auth.session,
+  });
 
-//   return {
-//     data,
-//     isPending,
-//     isError,
-//   };
-// };
+  return {
+    data,
+    isPending,
+    isError,
+  };
+};
 
 export const useCreateMedicalCareTemplate = () => {
   const queryClient = useQueryClient();
@@ -63,8 +68,21 @@ export const useCreateMedicalCareTemplate = () => {
   const { mutate } = useMutation({
     mutationFn: (variables: { newTemplate: TablesInsert<'medical_care_templates'> }) =>
       createMedicalCareTemplate(variables.newTemplate),
-    onSuccess: (data) => {
-      console.log('create success: ', data);
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: medicalCareTemplateKeys.lists() });
+    },
+  });
+
+  return { mutate };
+};
+
+export const useUpsertMedicalCareTemplate = () => {
+  const queryClient = useQueryClient();
+
+  const { mutate } = useMutation({
+    mutationFn: (variables: { newTemplate: TablesInsert<'medical_care_templates'> }) =>
+      upsertMedicalCareTemplate(variables.newTemplate),
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: medicalCareTemplateKeys.lists() });
     },
   });
@@ -81,12 +99,8 @@ export const useUpdateMedicalCareTemplate = () => {
       updates: Partial<TablesUpdate<'medical_care_templates'>>;
     }) => updateMedicalCareTemplate(variables.id, variables.updates),
     onSuccess: (data, variables) => {
-      console.log('update success id: ', variables.id);
+      queryClient.invalidateQueries({ queryKey: medicalCareTemplateKeys.lists() });
       queryClient.invalidateQueries({ queryKey: medicalCareTemplateKeys.detail(variables.id) });
-      if ('finished_at' in variables.updates) {
-        console.log('update key finished_at');
-        queryClient.invalidateQueries({ queryKey: medicalCareTemplateKeys.detail(variables.id) });
-      }
     },
   });
 
@@ -103,9 +117,8 @@ export const useDeleteMedicalCareTemplate = () => {
         throw new Error(response.error.message);
       }
       return response.data;
-    }, // deleteMedicalCareTemplate関数を呼び出す
-    onSuccess: (data, id) => {
-      console.log('delete success id: ', id);
+    },
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: medicalCareTemplateKeys.lists() });
     },
   });

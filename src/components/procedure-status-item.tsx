@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { durationTimeFormatMS } from '@/lib/date';
 import { cn } from '@/lib/utils';
 import { MedicalCare } from '@/service/medical-care/type';
-import { Procedure } from '@/types/procedure';
+import { Procedure, RecordTypeDone } from '@/types/procedure';
 import { Check, Play, Undo2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
@@ -15,13 +15,13 @@ type ProcedureItemProps = {
   onUpdate: (proc: Procedure) => void;
 };
 
-export default function ProcedureItem({ care, proc, onUpdate }: ProcedureItemProps) {
+export default function ProcedureStatusItem({ care, proc, onUpdate }: ProcedureItemProps) {
   const [elapsedTime, setElapsedTime] = useState<string>('');
   const [updating, setUpdating] = useState(false);
 
   // 経過時間を計算して更新する
   useEffect(() => {
-    if (!proc.started_at || proc.has_start_only) return;
+    if (!proc.started_at || proc.record_type === RecordTypeDone) return;
 
     const updateElapsedTime = () => {
       const formatted = durationTimeFormatMS(
@@ -38,11 +38,11 @@ export default function ProcedureItem({ care, proc, onUpdate }: ProcedureItemPro
       const intervalId = setInterval(updateElapsedTime, 1000);
       return () => clearInterval(intervalId);
     }
-  }, [proc.started_at, proc.finished_at, proc.has_start_only, care.finished_at]);
+  }, [proc.started_at, proc.finished_at, proc.record_type, care.finished_at]);
 
   const isWill = !proc.started_at;
-  const isDoing = proc.started_at && !proc.has_start_only && !proc.finished_at;
-  const isDone = (proc.started_at && proc.has_start_only) || proc.finished_at;
+  const isDoing = proc.started_at && proc.record_type !== RecordTypeDone && !proc.finished_at;
+  const isDone = (proc.started_at && proc.record_type === RecordTypeDone) || proc.finished_at;
 
   return (
     <div
@@ -63,8 +63,8 @@ export default function ProcedureItem({ care, proc, onUpdate }: ProcedureItemPro
             {`${durationTimeFormatMS(
               new Date(care.started_at || ''),
               new Date(proc.started_at || ''),
-            )} ${proc.has_start_only ? '実施' : '開始'}`}
-            {!proc.has_start_only && (isDoing || isDone) && (
+            )} ${proc.record_type === RecordTypeDone ? '実施' : '開始'}`}
+            {proc.record_type !== RecordTypeDone && (isDoing || isDone) && (
               <span className="ml-1">{`(${elapsedTime}${isDoing ? '経過' : 'で終了'})`}</span>
             )}
           </p>
@@ -99,7 +99,8 @@ export default function ProcedureItem({ care, proc, onUpdate }: ProcedureItemPro
           </Button>
           <Button
             className={cn(
-              (proc.finished_at || (proc.has_start_only && proc.started_at)) && 'invisible',
+              (proc.finished_at || (proc.record_type === RecordTypeDone && proc.started_at)) &&
+                'invisible',
             )}
             onClick={async () => {
               setUpdating(true);
@@ -116,7 +117,7 @@ export default function ProcedureItem({ care, proc, onUpdate }: ProcedureItemPro
             {updating ? (
               <Spinner />
             ) : !proc.started_at ? (
-              proc.has_start_only ? (
+              proc.record_type === RecordTypeDone ? (
                 <>
                   実施
                   <Check />
@@ -128,7 +129,7 @@ export default function ProcedureItem({ care, proc, onUpdate }: ProcedureItemPro
                 </>
               )
             ) : (
-              !proc.has_start_only && (
+              proc.record_type !== RecordTypeDone && (
                 <>
                   終了
                   <Check />
