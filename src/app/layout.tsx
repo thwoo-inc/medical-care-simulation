@@ -17,6 +17,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: '医療シミュレーション',
   description: '山口大学医学部で実施する医療シミュレーション用Webアプリです',
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default function RootLayout({
