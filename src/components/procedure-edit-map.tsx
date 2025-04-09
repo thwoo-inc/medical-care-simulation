@@ -55,6 +55,11 @@ export default function ProdedureEditMap({ template }: { template: MedicalCareTe
               {stepProcedures.length === 0 && (
                 <ProcedureAddItem template={template} department={selectedDept} step={step} />
               )}
+              {selectedDept === '' && (
+                <div className="w-full h-full">
+                  <ProcedureAddItem template={template} department={''} step={step} />
+                </div>
+              )}
             </div>
           </div>
         );
